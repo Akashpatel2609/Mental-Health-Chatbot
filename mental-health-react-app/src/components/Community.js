@@ -39,6 +39,7 @@ import {
   MoreVert
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
+import { colors } from '../theme';
 
 const Community = () => {
   const [communityStats, setCommunityStats] = useState({});
@@ -193,10 +194,10 @@ const Community = () => {
         transition={{ duration: 0.6 }}
       >
         <Box sx={{ mb: 4, textAlign: 'center' }}>
-          <Typography variant="h3" sx={{ fontWeight: 700, color: '#667eea', mb: 1 }}>
+          <Typography variant="h3" sx={{ fontWeight: 700, color: colors.primary.main, mb: 1 }}>
             👥 Community
           </Typography>
-          <Typography variant="h6" sx={{ color: '#888', fontWeight: 400 }}>
+          <Typography variant="h6" sx={{ color: colors.text.secondary, fontWeight: 400 }}>
             Connect with others on their mental wellness journey
           </Typography>
         </Box>
@@ -210,7 +211,7 @@ const Community = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
           >
-            <Card sx={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: 'white' }}>
+            <Card sx={{ background: colors.gradients.primary, color: colors.primary.contrastText }}>
               <CardContent sx={{ p: 4 }}>
                 <Grid container spacing={3}>
                   <Grid item xs={6} sm={3}>
@@ -266,18 +267,19 @@ const Community = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <Card sx={{ background: 'linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%)' }}>
+            <Card sx={{ background: colors.gradients.secondary }}>
               <CardContent sx={{ p: 4 }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-                  <Typography variant="h5" sx={{ fontWeight: 600, color: '#667eea' }}>
+                  <Typography variant="h5" sx={{ fontWeight: 600, color: colors.primary.main }}>
                     Recent Discussions
                   </Typography>
                   <Button
                     variant="contained"
                     startIcon={<Add />}
                     sx={{
-                      bgcolor: '#667eea',
-                      '&:hover': { bgcolor: '#5a6fd8' }
+                      background: colors.gradients.primary,
+                      color: colors.neutral.darkGray,
+                      '&:hover': { background: colors.gradients.primary, color: colors.primary.contrastText }
                     }}
                   >
                     Start Discussion
@@ -295,7 +297,7 @@ const Community = () => {
                         </InputAdornment>
                       ),
                     }}
-                    sx={{ bgcolor: 'white' }}
+                    sx={{ background: colors.neutral.gray }}
                   />
                 </Box>
 
@@ -309,14 +311,14 @@ const Community = () => {
                     >
                       <ListItem sx={{ 
                         mb: 2, 
-                        bgcolor: 'white', 
+                        backgroundColor: colors.neutral.gray, 
                         borderRadius: 2,
                         boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
                         flexDirection: 'column',
                         alignItems: 'flex-start'
                       }}>
                         <Box sx={{ display: 'flex', width: '100%', alignItems: 'flex-start', mb: 2 }}>
-                          <Avatar sx={{ mr: 2, bgcolor: '#667eea' }}>
+                          <Avatar sx={{ mr: 2, backgroundColor: colors.primary.main }}>
                             {discussion.authorAvatar}
                           </Avatar>
                           <Box sx={{ flexGrow: 1 }}>
@@ -325,10 +327,10 @@ const Community = () => {
                                 {discussion.title}
                               </Typography>
                               {discussion.isPinned && (
-                                <Chip label="Pinned" size="small" sx={{ bgcolor: '#ff9800', color: 'white' }} />
+                                <Chip label="Pinned" size="small" sx={{ backgroundColor: colors.secondary.main, color: colors.secondary.contrastText }} />
                               )}
                             </Box>
-                            <Typography variant="body2" sx={{ color: '#888', mb: 1 }}>
+                            <Typography variant="body2" sx={{ color: colors.text.secondary, mb: 1 }}>
                               by {discussion.author} • {discussion.timeAgo}
                             </Typography>
                             <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
@@ -337,7 +339,7 @@ const Community = () => {
                                   key={tagIndex}
                                   label={tag}
                                   size="small"
-                                  sx={{ bgcolor: 'rgba(102,126,234,0.1)', color: '#667eea' }}
+                                  sx={{ backgroundColor: colors.neutral.gray, color: colors.primary.main }}
                                 />
                               ))}
                             </Box>
@@ -351,21 +353,21 @@ const Community = () => {
                           <Button
                             startIcon={<Message />}
                             size="small"
-                            sx={{ color: '#888' }}
+                            sx={{ color: colors.text.secondary }}
                           >
                             {discussion.replies} replies
                           </Button>
                           <Button
                             startIcon={<ThumbUp />}
                             size="small"
-                            sx={{ color: '#888' }}
+                            sx={{ color: colors.text.secondary }}
                           >
                             {discussion.likes} likes
                           </Button>
                           <Button
                             startIcon={<Share />}
                             size="small"
-                            sx={{ color: '#888' }}
+                            sx={{ color: colors.text.secondary }}
                           >
                             Share
                           </Button>
@@ -379,9 +381,9 @@ const Community = () => {
                   <Button
                     variant="outlined"
                     sx={{
-                      borderColor: '#667eea',
-                      color: '#667eea',
-                      '&:hover': { borderColor: '#5a6fd8', bgcolor: 'rgba(102,126,234,0.05)' }
+                      borderColor: colors.primary.main,
+                      color: colors.primary.main,
+                      '&:hover': { borderColor: colors.primary.main, backgroundColor: colors.neutral.gray }
                     }}
                   >
                     View All Discussions
@@ -399,9 +401,9 @@ const Community = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
           >
-            <Card sx={{ height: '100%', background: 'linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%)' }}>
+            <Card sx={{ height: '100%', background: colors.gradients.secondary }}>
               <CardContent sx={{ p: 4 }}>
-                <Typography variant="h5" sx={{ fontWeight: 600, color: '#667eea', mb: 3 }}>
+                <Typography variant="h5" sx={{ fontWeight: 600, color: colors.primary.main, mb: 3 }}>
                   Community Challenges
                 </Typography>
 
@@ -412,7 +414,7 @@ const Community = () => {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.4, delay: 0.1 * index }}
                   >
-                    <Card sx={{ mb: 2, bgcolor: 'white' }}>
+                    <Card sx={{ mb: 2, backgroundColor: colors.neutral.gray }}>
                       <CardContent sx={{ p: 3 }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                           <EmojiEvents sx={{ color: challenge.color, mr: 1 }} />
@@ -421,16 +423,16 @@ const Community = () => {
                           </Typography>
                         </Box>
                         
-                        <Typography variant="body2" sx={{ color: '#666', mb: 2 }}>
+                        <Typography variant="body2" sx={{ color: colors.text.secondary, mb: 2 }}>
                           {challenge.description}
                         </Typography>
                         
                         <Box sx={{ mb: 2 }}>
                           <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                            <Typography variant="body2" sx={{ color: '#888' }}>
+                            <Typography variant="body2" sx={{ color: colors.text.secondary }}>
                               Progress
                             </Typography>
-                            <Typography variant="body2" sx={{ color: '#888' }}>
+                            <Typography variant="body2" sx={{ color: colors.text.secondary }}>
                               {challenge.progress}%
                             </Typography>
                           </Box>
@@ -440,9 +442,9 @@ const Community = () => {
                             sx={{
                               height: 6,
                               borderRadius: 3,
-                              bgcolor: 'rgba(102,126,234,0.1)',
+                              backgroundColor: colors.neutral.gray,
                               '& .MuiLinearProgress-bar': {
-                                bgcolor: challenge.color,
+                                backgroundColor: challenge.color,
                                 borderRadius: 3
                               }
                             }}
@@ -450,10 +452,10 @@ const Community = () => {
                         </Box>
                         
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                          <Typography variant="body2" sx={{ color: '#888' }}>
+                          <Typography variant="body2" sx={{ color: colors.text.secondary }}>
                             {challenge.participants} participants
                           </Typography>
-                          <Typography variant="body2" sx={{ color: '#888' }}>
+                          <Typography variant="body2" sx={{ color: colors.text.secondary }}>
                             {challenge.daysLeft} days left
                           </Typography>
                         </Box>
@@ -462,8 +464,8 @@ const Community = () => {
                           variant="contained"
                           size="small"
                           sx={{
-                            bgcolor: challenge.color,
-                            '&:hover': { bgcolor: challenge.color }
+                            backgroundColor: challenge.color,
+                            '&:hover': { backgroundColor: challenge.color }
                           }}
                           fullWidth
                         >
@@ -485,9 +487,9 @@ const Community = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
           >
-            <Card sx={{ background: 'linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%)' }}>
+            <Card sx={{ background: colors.gradients.secondary }}>
               <CardContent sx={{ p: 4 }}>
-                <Typography variant="h5" sx={{ fontWeight: 600, color: '#667eea', mb: 3 }}>
+                <Typography variant="h5" sx={{ fontWeight: 600, color: colors.primary.main, mb: 3 }}>
                   Active Members
                 </Typography>
 
@@ -513,7 +515,7 @@ const Community = () => {
                               <Avatar sx={{ 
                                 width: 60, 
                                 height: 60, 
-                                bgcolor: '#667eea',
+                                backgroundColor: colors.primary.main,
                                 fontSize: '1.5rem'
                               }}>
                                 {member.avatar}
@@ -526,7 +528,7 @@ const Community = () => {
                                   width: 16,
                                   height: 16,
                                   borderRadius: '50%',
-                                  bgcolor: member.isOnline ? '#4caf50' : '#ccc',
+                                  backgroundColor: member.isOnline ? colors.primary.main : colors.neutral.gray,
                                   border: '2px solid white'
                                 }}
                               />
@@ -537,7 +539,7 @@ const Community = () => {
                             </Typography>
                             
                             <Box sx={{ mb: 2 }}>
-                              <Typography variant="body2" sx={{ color: '#888', mb: 1 }}>
+                              <Typography variant="body2" sx={{ color: colors.text.secondary, mb: 1 }}>
                                 Wellness Score
                               </Typography>
                               <LinearProgress
@@ -546,14 +548,14 @@ const Community = () => {
                                 sx={{
                                   height: 6,
                                   borderRadius: 3,
-                                  bgcolor: 'rgba(102,126,234,0.1)',
+                                  backgroundColor: colors.neutral.gray,
                                   '& .MuiLinearProgress-bar': {
-                                    bgcolor: getWellnessColor(member.wellnessScore),
+                                    backgroundColor: getWellnessColor(member.wellnessScore),
                                     borderRadius: 3
                                   }
                                 }}
                               />
-                              <Typography variant="caption" sx={{ color: '#888' }}>
+                              <Typography variant="caption" sx={{ color: colors.text.secondary }}>
                                 {member.wellnessScore}/100
                               </Typography>
                             </Box>
@@ -565,8 +567,8 @@ const Community = () => {
                                   label={badge}
                                   size="small"
                                   sx={{ 
-                                    bgcolor: 'rgba(102,126,234,0.1)', 
-                                    color: '#667eea',
+                                    backgroundColor: colors.neutral.gray, 
+                                    color: colors.primary.main,
                                     fontSize: '0.7rem'
                                   }}
                                 />
@@ -579,9 +581,9 @@ const Community = () => {
                               startIcon={<Chat />}
                               sx={{
                                 mt: 2,
-                                borderColor: '#667eea',
-                                color: '#667eea',
-                                '&:hover': { borderColor: '#5a6fd8', bgcolor: 'rgba(102,126,234,0.05)' }
+                                borderColor: colors.primary.main,
+                                color: colors.primary.main,
+                                '&:hover': { borderColor: colors.primary.main, backgroundColor: colors.neutral.gray }
                               }}
                               fullWidth
                             >

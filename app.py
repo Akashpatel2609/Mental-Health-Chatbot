@@ -396,48 +396,74 @@ def chat(current_user):
 @app.route('/user-stats/<username>')
 @token_required
 def get_user_stats(current_user, username):
-    """Get user statistics and insights"""
+    """Get user statistics and insights with weighted wellness score"""
     try:
         if current_user.username != username:
             return jsonify({'error': 'Unauthorized'}), 403
         
-        # Get conversation stats
+        # Get stats
         conversations = Conversation.query.filter_by(user_id=current_user.id).all()
         activities = Activity.query.filter_by(user_id=current_user.id).all()
         mood_entries = MoodEntry.query.filter_by(user_id=current_user.id).all()
         
-        # Calculate stats
+        # --- Weighted Wellness Score Calculation ---
+        # Weights: Conversations 20%, Activities 25%, Mood 30%, Insights 25%
+        # All normalized to 0-100, then weighted sum
+        # New users start at 0
+        
+        # Conversations (max 20 for full score)
+        convo_count = len(conversations)
+        convo_score = min(convo_count, 20) / 20 * 100 if convo_count > 0 else 0
+        
+        # Activities (max 20 for full score)
+        activity_count = len(activities)
+        activity_score = min(activity_count, 20) / 20 * 100 if activity_count > 0 else 0
+        
+        # Mood Tracking (average mood 1-10, normalized)
+        if mood_entries:
+            avg_mood = sum(m.mood_score for m in mood_entries) / len(mood_entries)
+            mood_score = (avg_mood - 1) / 9 * 100  # 1-10 scale to 0-100
+        else:
+            mood_score = 0
+        
+        # Insights (e.g., improvement streaks, positive trends)
+        # For now, use streak of positive/neutral moods in last 7 entries
+        insight_score = 0
+        if mood_entries:
+            last_7 = sorted(mood_entries, key=lambda m: m.timestamp, reverse=True)[:7]
+            streak = 0
+            for m in last_7:
+                if m.mood_score >= 6:  # 6-10 is positive
+                    streak += 1
+                else:
+                    break
+            insight_score = streak / 7 * 100 if last_7 else 0
+        
+        # Weighted sum
+        wellness_score = (
+            convo_score * 0.20 +
+            activity_score * 0.25 +
+            mood_score * 0.30 +
+            insight_score * 0.25
+        )
+        wellness_score = round(max(0, min(100, wellness_score)))
+        
+        # Emotions count for frontend
         emotions_count = {}
         for conv in conversations:
             emotion = conv.emotion_detected or 'neutral'
             emotions_count[emotion] = emotions_count.get(emotion, 0) + 1
         
-        # Calculate wellness score
-        wellness_score = 50  # Base score
-        if 'happiness' in emotions_count:
-            wellness_score += min(emotions_count['happiness'] * 5, 30)
-        if 'positive' in emotions_count:
-            wellness_score += min(emotions_count['positive'] * 3, 20)
-        if len(activities) > 0:
-            wellness_score += min(len(activities) * 2, 20)
-        if 'sadness' in emotions_count:
-            wellness_score -= min(emotions_count['sadness'] * 3, 20)
-        if 'anxiety' in emotions_count:
-            wellness_score -= min(emotions_count['anxiety'] * 3, 20)
-        
-        wellness_score = max(0, min(100, wellness_score))
-        
         return jsonify({
             'username': current_user.username,
-            'total_conversations': len(conversations),
-            'activity_count': len(activities),
+            'total_conversations': convo_count,
+            'activity_count': activity_count,
             'emotions_count': emotions_count,
             'most_common_emotion': max(emotions_count.items(), key=lambda x: x[1])[0] if emotions_count else 'neutral',
             'wellness_score': wellness_score,
             'last_activity': activities[-1].to_dict() if activities else None,
             'timestamp': datetime.now().isoformat()
         })
-        
     except Exception as e:
         print(f"Error getting user stats: {e}")
         return jsonify({

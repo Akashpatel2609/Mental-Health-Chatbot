@@ -41,6 +41,7 @@ import {
   Security
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
+import { colors } from '../theme';
 
 const Resources = () => {
   const [emergencyResources, setEmergencyResources] = useState([]);
@@ -162,10 +163,10 @@ const Resources = () => {
         transition={{ duration: 0.6 }}
       >
         <Box sx={{ mb: 4, textAlign: 'center' }}>
-          <Typography variant="h3" sx={{ fontWeight: 700, color: '#667eea', mb: 1 }}>
+          <Typography variant="h3" sx={{ fontWeight: 700, color: colors.primary.main, mb: 1 }}>
             🆘 Resources & Support
           </Typography>
-          <Typography variant="h6" sx={{ color: '#888', fontWeight: 400 }}>
+          <Typography variant="h6" sx={{ color: colors.text.secondary, fontWeight: 400 }}>
             Find help, support, and educational resources for your mental health journey
           </Typography>
         </Box>
@@ -181,12 +182,12 @@ const Resources = () => {
           severity="error" 
           sx={{ 
             mb: 4, 
-            background: 'linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%)',
-            color: 'white',
-            '& .MuiAlert-icon': { color: 'white' }
+            background: colors.gradients.primary,
+            color: colors.primary.contrastText,
+            '& .MuiAlert-icon': { color: colors.primary.contrastText }
           }}
         >
-          <AlertTitle sx={{ color: 'white', fontWeight: 600 }}>
+          <AlertTitle sx={{ color: colors.primary.contrastText, fontWeight: 600 }}>
             🚨 Crisis Support Available 24/7
           </AlertTitle>
           If you're in immediate danger or experiencing thoughts of self-harm, please call <strong>988</strong> (Suicide Prevention Lifeline) or <strong>911</strong> immediately. You're not alone, and help is available.
@@ -201,9 +202,9 @@ const Resources = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <Card sx={{ background: 'linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%)' }}>
+            <Card sx={{ background: colors.gradients.primary, color: colors.primary.contrastText }}>
               <CardContent sx={{ p: 4 }}>
-                <Typography variant="h5" sx={{ fontWeight: 600, color: '#667eea', mb: 3 }}>
+                <Typography variant="h5" sx={{ fontWeight: 600, color: colors.primary.main, mb: 3 }}>
                   Emergency Resources
                 </Typography>
 
@@ -239,7 +240,7 @@ const Resources = () => {
                               {resource.name}
                             </Typography>
                             
-                            <Typography variant="body2" sx={{ color: '#666', mb: 2 }}>
+                            <Typography variant="body2" sx={{ color: colors.text.secondary, mb: 2 }}>
                               {resource.description}
                             </Typography>
                             
@@ -249,9 +250,10 @@ const Resources = () => {
                                 startIcon={<Call />}
                                 onClick={() => handleEmergencyCall(resource.phone)}
                                 sx={{
-                                  bgcolor: '#f44336',
+                                  background: colors.gradients.secondary,
+                                  color: colors.neutral.darkGray,
                                   mb: 1,
-                                  '&:hover': { bgcolor: '#d32f2f' }
+                                  '&:hover': { background: colors.gradients.primary, color: colors.primary.contrastText }
                                 }}
                                 fullWidth
                               >
@@ -270,9 +272,9 @@ const Resources = () => {
                               startIcon={<Language />}
                               onClick={() => handleResourceClick(resource.website)}
                               sx={{
-                                borderColor: '#667eea',
-                                color: '#667eea',
-                                '&:hover': { borderColor: '#5a6fd8', bgcolor: 'rgba(102,126,234,0.05)' }
+                                borderColor: colors.primary.main,
+                                color: colors.primary.main,
+                                '&:hover': { borderColor: colors.primary.dark, background: colors.gradients.secondary }
                               }}
                               fullWidth
                             >
@@ -297,17 +299,17 @@ const Resources = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3 + (index * 0.1) }}
             >
-              <Card sx={{ height: '100%', background: 'linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%)' }}>
+              <Card sx={{ height: '100%', background: colors.gradients.primary, color: colors.primary.contrastText }}>
                 <CardContent sx={{ p: 4 }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
                     <Avatar sx={{ bgcolor: category.color, mr: 2 }}>
                       {category.icon}
                     </Avatar>
                     <Box>
-                      <Typography variant="h6" sx={{ fontWeight: 600, color: '#667eea' }}>
+                      <Typography variant="h6" sx={{ fontWeight: 600, color: colors.primary.main }}>
                         {category.title}
                       </Typography>
-                      <Typography variant="body2" sx={{ color: '#888' }}>
+                      <Typography variant="body2" sx={{ color: colors.text.secondary }}>
                         {category.description}
                       </Typography>
                     </Box>
@@ -330,7 +332,7 @@ const Resources = () => {
                               href={resource.url}
                               target="_blank"
                               sx={{ 
-                                color: '#667eea', 
+                                color: colors.primary.main, 
                                 textDecoration: 'none',
                                 fontWeight: 500,
                                 '&:hover': { textDecoration: 'underline' }
@@ -357,9 +359,9 @@ const Resources = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.6 }}
           >
-            <Card sx={{ background: 'linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%)' }}>
+            <Card sx={{ background: colors.gradients.primary, color: colors.primary.contrastText }}>
               <CardContent sx={{ p: 4 }}>
-                <Typography variant="h5" sx={{ fontWeight: 600, color: '#667eea', mb: 3 }}>
+                <Typography variant="h5" sx={{ fontWeight: 600, color: colors.primary.main, mb: 3 }}>
                   Educational Resources
                 </Typography>
 
@@ -385,7 +387,7 @@ const Resources = () => {
                               display: 'flex', 
                               justifyContent: 'center', 
                               mb: 2,
-                              color: '#667eea'
+                              color: colors.primary.main
                             }}>
                               {content.icon}
                             </Box>
@@ -394,7 +396,7 @@ const Resources = () => {
                               {content.title}
                             </Typography>
                             
-                            <Typography variant="body2" sx={{ color: '#666', mb: 2 }}>
+                            <Typography variant="body2" sx={{ color: colors.text.secondary, mb: 2 }}>
                               {content.description}
                             </Typography>
                             
@@ -402,9 +404,9 @@ const Resources = () => {
                               <Chip
                                 label={content.type}
                                 size="small"
-                                sx={{ bgcolor: 'rgba(102,126,234,0.1)', color: '#667eea' }}
+                                sx={{ backgroundColor: colors.gradients.secondary, color: colors.primary.main }}
                               />
-                              <Typography variant="caption" sx={{ color: '#888' }}>
+                              <Typography variant="caption" sx={{ color: colors.text.secondary }}>
                                 {content.duration}
                               </Typography>
                             </Box>
@@ -413,9 +415,9 @@ const Resources = () => {
                               variant="outlined"
                               size="small"
                               sx={{
-                                borderColor: '#667eea',
-                                color: '#667eea',
-                                '&:hover': { borderColor: '#5a6fd8', bgcolor: 'rgba(102,126,234,0.05)' }
+                                borderColor: colors.primary.main,
+                                color: colors.primary.main,
+                                '&:hover': { borderColor: colors.primary.dark, background: colors.gradients.secondary }
                               }}
                               fullWidth
                             >
@@ -440,17 +442,18 @@ const Resources = () => {
             transition={{ duration: 0.6, delay: 0.7 }}
           >
             <Card sx={{ 
-              background: 'linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%)',
-              border: '2px solid #ff9800'
+              background: colors.gradients.primary,
+              border: `2px solid ${colors.primary.main}`,
+              color: colors.primary.contrastText
             }}>
               <CardContent sx={{ p: 4 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-                  <Security sx={{ color: '#ff9800', fontSize: 40, mr: 2 }} />
+                  <Security sx={{ color: colors.primary.main, fontSize: 40, mr: 2 }} />
                   <Box>
-                    <Typography variant="h5" sx={{ fontWeight: 600, color: '#e65100' }}>
+                    <Typography variant="h5" sx={{ fontWeight: 600, color: colors.primary.main }}>
                       Safety & Privacy
                     </Typography>
-                    <Typography variant="body2" sx={{ color: '#888' }}>
+                    <Typography variant="body2" sx={{ color: colors.text.secondary }}>
                       Your privacy and safety are our top priorities
                     </Typography>
                   </Box>
@@ -458,25 +461,25 @@ const Resources = () => {
 
                 <Grid container spacing={3}>
                   <Grid item xs={12} md={6}>
-                    <Typography variant="h6" sx={{ fontWeight: 600, color: '#e65100', mb: 2 }}>
+                    <Typography variant="h6" sx={{ fontWeight: 600, color: colors.primary.main, mb: 2 }}>
                       Privacy Protection
                     </Typography>
                     <List>
                       <ListItem sx={{ px: 0 }}>
                         <ListItemIcon sx={{ minWidth: 40 }}>
-                          <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#ff9800' }} />
+                          <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: colors.primary.main }} />
                         </ListItemIcon>
                         <ListItemText primary="All conversations are private and secure" />
                       </ListItem>
                       <ListItem sx={{ px: 0 }}>
                         <ListItemIcon sx={{ minWidth: 40 }}>
-                          <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#ff9800' }} />
+                          <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: colors.primary.main }} />
                         </ListItemIcon>
                         <ListItemText primary="Your data is encrypted and protected" />
                       </ListItem>
                       <ListItem sx={{ px: 0 }}>
                         <ListItemIcon sx={{ minWidth: 40 }}>
-                          <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#ff9800' }} />
+                          <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: colors.primary.main }} />
                         </ListItemIcon>
                         <ListItemText primary="You can export or delete your data anytime" />
                       </ListItem>
@@ -484,25 +487,25 @@ const Resources = () => {
                   </Grid>
 
                   <Grid item xs={12} md={6}>
-                    <Typography variant="h6" sx={{ fontWeight: 600, color: '#e65100', mb: 2 }}>
+                    <Typography variant="h6" sx={{ fontWeight: 600, color: colors.primary.main, mb: 2 }}>
                       Crisis Safety
                     </Typography>
                     <List>
                       <ListItem sx={{ px: 0 }}>
                         <ListItemIcon sx={{ minWidth: 40 }}>
-                          <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#ff9800' }} />
+                          <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: colors.primary.main }} />
                         </ListItemIcon>
                         <ListItemText primary="Crisis detection and immediate support" />
                       </ListItem>
                       <ListItem sx={{ px: 0 }}>
                         <ListItemIcon sx={{ minWidth: 40 }}>
-                          <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#ff9800' }} />
+                          <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: colors.primary.main }} />
                         </ListItemIcon>
                         <ListItemText primary="Direct access to emergency resources" />
                       </ListItem>
                       <ListItem sx={{ px: 0 }}>
                         <ListItemIcon sx={{ minWidth: 40 }}>
-                          <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#ff9800' }} />
+                          <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: colors.primary.main }} />
                         </ListItemIcon>
                         <ListItemText primary="24/7 crisis hotline integration" />
                       </ListItem>

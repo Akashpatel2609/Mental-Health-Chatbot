@@ -2,86 +2,87 @@ import { createTheme } from '@mui/material/styles';
 
 // Premium healthcare professional color palette
 const colors = {
-  // Primary colors - Deep, trustworthy teal/blue
+  // Primary colors - Blue Sky
   primary: {
-    main: '#2C5F2D', // Deep forest green - medical trust
-    light: '#4A7C59',
-    dark: '#1B4F1B',
-    contrastText: '#FFFFFF'
+    main: '#4F8CFF', // Primary
+    light: '#A3C9FF', // Lighter blue
+    dark: '#1E4DB7', // For contrast
+    contrastText: '#FFFFFF' // For text on primary
   },
   
-  // Secondary colors - Warm, healing gold
+  // Secondary colors - Soft Coral
   secondary: {
-    main: '#D4AF37', // Premium gold
-    light: '#E6C866',
-    dark: '#B8941F',
-    contrastText: '#FFFFFF'
+    main: '#FFB385', // Secondary
+    light: '#FFE0CC', // Lighter coral
+    dark: '#FF8C42', // Deeper accent
+    contrastText: '#222B45' // For text on secondary
   },
   
-  // Neutral colors - Sophisticated grays
+  // Accent colors - Fresh Green
+  accent: {
+    main: '#6EE7B7',
+    light: '#D1FAE5',
+    dark: '#059669',
+    contrastText: '#222B45'
+  },
+  
+  // Neutral colors
   neutral: {
     white: '#FFFFFF',
-    lightGray: '#F5F7FA', // Cool, clean light gray
-    gray: '#E8EDF2', // Soft blue-gray
-    mediumGray: '#6B7280', // Professional gray
-    darkGray: '#374151', // Deep gray
-    charcoal: '#1F2937' // Rich charcoal
+    lightGray: '#F9FAFB',
+    gray: '#E5E7EB',
+    mediumGray: '#A1A9B8',
+    darkGray: '#222B45',
+    charcoal: '#222B45'
   },
   
-  // Success colors - Healing green
+  // Success, warning, error, info
   success: {
-    main: '#059669', // Emerald green
-    light: '#10B981',
-    dark: '#047857'
+    main: '#6EE7B7',
+    light: '#D1FAE5',
+    dark: '#059669'
   },
-  
-  // Warning colors - Professional amber
   warning: {
-    main: '#D97706', // Professional amber
-    light: '#F59E0B',
-    dark: '#B45309'
+    main: '#FFB385',
+    light: '#FFE0CC',
+    dark: '#FF8C42'
   },
-  
-  // Error colors - Medical red
   error: {
-    main: '#DC2626', // Medical red
-    light: '#EF4444',
-    dark: '#B91C1C'
+    main: '#FF6B6B',
+    light: '#FFB3B3',
+    dark: '#C70000'
   },
-  
-  // Info colors - Medical blue
   info: {
-    main: '#2563EB', // Medical blue
-    light: '#3B82F6',
-    dark: '#1D4ED8'
+    main: '#4F8CFF',
+    light: '#A3C9FF',
+    dark: '#1E4DB7'
   },
   
-  // Background gradients - Premium healthcare
+  // Background gradients
   gradients: {
-    primary: 'linear-gradient(135deg, #2C5F2D 0%, #1B4F1B 100%)',
-    secondary: 'linear-gradient(135deg, #D4AF37 0%, #B8941F 100%)',
-    neutral: 'linear-gradient(135deg, #F5F7FA 0%, #E8EDF2 100%)',
-    warm: 'linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%)',
-    cool: 'linear-gradient(135deg, #DBEAFE 0%, #BFDBFE 100%)',
-    landing: 'linear-gradient(135deg, #2C5F2D 0%, #D4AF37 100%)',
-    premium: 'linear-gradient(135deg, #1F2937 0%, #374151 100%)',
-    medical: 'linear-gradient(135deg, #F5F7FA 0%, #E8EDF2 100%)'
+    primary: 'linear-gradient(135deg, #A3C9FF 0%, #4F8CFF 100%)',
+    secondary: 'linear-gradient(135deg, #FFB385 0%, #FFE0CC 100%)',
+    accent: 'linear-gradient(135deg, #6EE7B7 0%, #D1FAE5 100%)',
+    neutral: 'linear-gradient(135deg, #F9FAFB 0%, #E5E7EB 100%)',
+    landing: 'linear-gradient(135deg, #F9FAFB 0%, #A3C9FF 100%)',
+    premium: 'linear-gradient(135deg, #A3C9FF 0%, #4F8CFF 100%)',
+    medical: 'linear-gradient(135deg, #F9FAFB 0%, #6EE7B7 100%)'
   },
   
-  // Text colors - Professional contrast
+  // Text colors
   text: {
-    primary: '#1F2937', // Rich dark gray
-    secondary: '#6B7280', // Professional gray
-    disabled: '#9CA3AF', // Muted gray
-    hint: '#6B7280' // Consistent with secondary
+    primary: '#222B45', // For main text
+    secondary: '#6B7280', // For secondary text
+    disabled: '#A1A9B8',
+    hint: '#A1A9B8'
   },
   
-  // Background colors - Premium healthcare
+  // Background colors
   background: {
-    default: '#F5F7FA', // Cool, clean background
-    paper: '#FFFFFF', // Pure white
-    card: '#FFFFFF', // Clean white
-    sidebar: '#F8FAFC' // Slightly cooler sidebar
+    default: '#F9FAFB', // Main background
+    paper: '#FFFFFF', // White for cards
+    card: '#FFFFFF', // White for cards
+    sidebar: '#F9FAFB' // Soft background for sidebar/nav
   }
 };
 

@@ -80,9 +80,9 @@ const SignIn = ({ onSwitchToSignUp }) => {
             width: { xs: '100%', sm: 400 },
             borderRadius: 3,
             boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
-            background: 'rgba(255, 255, 255, 0.95)',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(255, 255, 255, 0.2)'
+            background: colors.neutral.white,
+            color: colors.neutral.darkGray,
+            border: `1px solid ${colors.primary.main}`
           }}
         >
           <CardContent sx={{ p: 4 }}>
@@ -198,24 +198,15 @@ const SignIn = ({ onSwitchToSignUp }) => {
                 disabled={loading}
                 sx={{
                   background: colors.gradients.primary,
-                  py: 1.5,
+                  color: colors.primary.contrastText,
+                  fontWeight: 700,
                   fontSize: '1.1rem',
-                  fontWeight: 600,
                   borderRadius: 2,
-                  '&:hover': {
-                    background: colors.gradients.secondary
-                  },
-                  '&:disabled': {
-                    background: colors.neutral.gray,
-                    color: colors.text.disabled
-                  }
+                  boxShadow: 2,
+                  '&:hover': { background: colors.gradients.secondary, color: colors.neutral.darkGray }
                 }}
               >
-                {loading ? (
-                  <CircularProgress size={24} sx={{ color: colors.neutral.white }} />
-                ) : (
-                  'Sign In'
-                )}
+                {loading ? <CircularProgress size={24} sx={{ color: colors.primary.contrastText }} /> : 'Sign In'}
               </Button>
             </Box>
 

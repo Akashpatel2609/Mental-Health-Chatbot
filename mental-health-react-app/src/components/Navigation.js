@@ -37,6 +37,8 @@ import {
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 import { colors } from '../theme';
+import { Link as RouterLink } from 'react-router-dom';
+import logo from '../assets/mira-logo.png';
 
 const Navigation = ({ onShowSignIn, onShowSignUp, currentUser, onLogout }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -117,41 +119,42 @@ const Navigation = ({ onShowSignIn, onShowSignUp, currentUser, onLogout }) => {
 
   return (
     <>
-      <AppBar position="fixed" sx={{ background: 'transparent', boxShadow: 'none' }}>
+      <AppBar position="fixed" sx={{ background: colors.neutral.darkGray, boxShadow: 'none' }}>
         <Toolbar>
-          <Typography variant="h4" component="div" sx={{ 
-            flexGrow: 1, 
-            color: colors.text.primary, 
-            fontWeight: 800, 
-            display: 'flex', 
-            alignItems: 'center', 
-            gap: 1.5,
-            fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
-            letterSpacing: '-0.5px'
-          }}>
-            <Favorite sx={{ color: colors.primary.main, fontSize: 36 }} />
-            MIRA
-          </Typography>
+          <Box
+            component={RouterLink}
+            to="/"
+            sx={{
+              flexGrow: 1,
+              display: 'flex',
+              alignItems: 'center',
+              textDecoration: 'none',
+              cursor: 'pointer',
+              minHeight: 56
+            }}
+          >
+            <img src={logo} alt="MIRA Logo" style={{ height: 48, width: 'auto', display: 'block' }} />
+          </Box>
           
           {!isMobile && (
             <Box sx={{ display: 'flex', gap: 2 }}>
               <Button 
                 color="inherit" 
-                sx={{ color: colors.text.primary }}
+                sx={{ color: colors.primary.contrastText, '&:hover': { color: colors.secondary.main } }}
                 onClick={() => setFeaturesOpen(true)}
               >
                 Features
               </Button>
               <Button 
                 color="inherit" 
-                sx={{ color: colors.text.primary }}
+                sx={{ color: colors.primary.contrastText, '&:hover': { color: colors.secondary.main } }}
                 onClick={() => setAboutOpen(true)}
               >
                 About
               </Button>
               <Button 
                 color="inherit" 
-                sx={{ color: colors.text.primary }}
+                sx={{ color: colors.primary.contrastText, '&:hover': { color: colors.secondary.main } }}
                 onClick={() => setSupportOpen(true)}
               >
                 Support
@@ -166,12 +169,12 @@ const Navigation = ({ onShowSignIn, onShowSignUp, currentUser, onLogout }) => {
                   variant="outlined" 
                   onClick={onShowSignIn}
                   sx={{ 
-                    borderColor: colors.primary.main, 
-                    color: colors.primary.main,
+                    borderColor: colors.secondary.main, 
+                    color: colors.primary.contrastText,
                     '&:hover': { 
-                      borderColor: colors.primary.dark,
-                      background: colors.primary.main,
-                      color: colors.neutral.white
+                      borderColor: colors.secondary.dark,
+                      background: colors.secondary.main,
+                      color: colors.neutral.darkGray
                     }
                   }}
                 >
@@ -181,16 +184,17 @@ const Navigation = ({ onShowSignIn, onShowSignUp, currentUser, onLogout }) => {
                   variant="contained" 
                   onClick={onShowSignUp}
                   sx={{ 
-                    background: 'linear-gradient(135deg, #1B4F1B 0%, #2C5F2D 100%)',
-                    color: colors.neutral.white,
+                    background: colors.gradients.secondary,
+                    color: colors.neutral.darkGray,
                     fontWeight: 700,
                     fontSize: '0.95rem',
                     px: 3,
                     py: 1.2,
                     '&:hover': { 
-                      background: 'linear-gradient(135deg, #0F3A0F 0%, #1B4F1B 100%)',
+                      background: colors.gradients.primary,
+                      color: colors.primary.contrastText,
                       transform: 'translateY(-1px)',
-                      boxShadow: '0 6px 20px rgba(27, 79, 27, 0.4)'
+                      boxShadow: '0 6px 20px rgba(7, 122, 125, 0.4)'
                     }
                   }}
                 >

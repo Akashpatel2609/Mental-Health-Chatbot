@@ -139,7 +139,7 @@ const LandingPage = () => {
       role: 'Parent',
       content: 'The crisis support features give me peace of mind. I know help is always available when I need it.',
       rating: 5,
-      avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=800&h=600&fit=crop&crop=face&q=80'
+      avatar: ''
     }
   ];
 
@@ -161,14 +161,14 @@ const LandingPage = () => {
           <Grid item xs={12} md={6}>
             <Box sx={{ textAlign: isMobile ? 'center' : 'left', color: colors.text.primary, px: isMobile ? 0 : 4 }}>
               <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
-                <Typography variant="h2" sx={{ fontWeight: 900, mb: 2, fontFamily: fancyFont, color: colors.neutral.white, letterSpacing: 1 }}>
+                <Typography variant="h2" sx={{ fontWeight: 900, mb: 2, fontFamily: fancyFont, color: colors.text.primary, letterSpacing: 1 }}>
                   Meet MIRA, Your AI Mental Health Buddy
                 </Typography>
-                <Typography variant="h5" sx={{ mb: 3, color: colors.neutral.white, fontWeight: 500, fontFamily: fancyFont, letterSpacing: 0.5 }}>
+                <Typography variant="h5" sx={{ mb: 3, color: colors.text.primary, fontWeight: 500, fontFamily: fancyFont, letterSpacing: 0.5 }}>
                   Compassionate, interactive, and always here for you. Explore wellness, track your mood, and chat with MIRA 24/7.
                 </Typography>
                 {currentUser && (
-                  <Typography variant="h6" sx={{ mb: 3, color: colors.neutral.white, fontWeight: 700, fontFamily: fancyFont }}>
+                  <Typography variant="h6" sx={{ mb: 3, color: colors.text.primary, fontWeight: 700, fontFamily: fancyFont }}>
                     Welcome back, {currentUser.first_name}! 💙
                   </Typography>
                 )}
@@ -181,7 +181,7 @@ const LandingPage = () => {
                         onClick={handleShowSignUp}
                         sx={{
                           background: colors.gradients.primary,
-                          color: colors.neutral.white,
+                          color: colors.primary.contrastText,
                           fontWeight: 700,
                           fontSize: '1.1rem',
                           borderRadius: 3,
@@ -189,7 +189,7 @@ const LandingPage = () => {
                           py: 1.5,
                           boxShadow: 3,
                           fontFamily: fancyFont,
-                          '&:hover': { background: colors.gradients.secondary }
+                          '&:hover': { background: colors.gradients.secondary, color: colors.neutral.darkGray }
                         }}
                       >
                         Start Your Journey
@@ -200,8 +200,8 @@ const LandingPage = () => {
                         size="large"
                         onClick={handleShowSignIn}
                         sx={{
-                          borderColor: colors.neutral.white,
-                          color: colors.neutral.white,
+                          borderColor: colors.primary.contrastText,
+                          color: colors.primary.contrastText,
                           fontWeight: 600,
                           fontSize: '1.1rem',
                           borderRadius: 3,
@@ -209,8 +209,9 @@ const LandingPage = () => {
                           py: 1.5,
                           fontFamily: fancyFont,
                           '&:hover': { 
-                            borderColor: colors.neutral.white,
-                            background: 'rgba(255,255,255,0.1)'
+                            borderColor: colors.primary.contrastText,
+                            background: 'rgba(245,238,221,0.1)',
+                            color: colors.neutral.darkGray
                           }
                         }}
                       >
@@ -224,7 +225,7 @@ const LandingPage = () => {
                       onClick={handleGoToDashboard}
                       sx={{
                         background: colors.gradients.primary,
-                        color: colors.neutral.white,
+                        color: colors.primary.contrastText,
                         fontWeight: 700,
                         fontSize: '1.1rem',
                         borderRadius: 3,
@@ -232,7 +233,7 @@ const LandingPage = () => {
                         py: 1.5,
                         boxShadow: 3,
                         fontFamily: fancyFont,
-                        '&:hover': { background: colors.gradients.secondary }
+                        '&:hover': { background: colors.gradients.secondary, color: colors.neutral.darkGray }
                       }}
                     >
                       Continue Session
@@ -248,7 +249,7 @@ const LandingPage = () => {
         {/* Highlights Section */}
         <Box sx={{ mt: 12, mb: 8 }}>
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2 }}>
-            <Typography variant="h3" sx={{ textAlign: 'center', mb: 6, fontWeight: 700, color: colors.neutral.white, fontFamily: fancyFont }}>
+            <Typography variant="h3" sx={{ textAlign: 'center', mb: 6, fontWeight: 700, color: colors.text.primary, fontFamily: fancyFont }}>
               Why Choose MIRA?
             </Typography>
           </motion.div>
@@ -279,7 +280,7 @@ const LandingPage = () => {
                       <Typography variant="h6" sx={{ mb: 2, fontWeight: 600, color: colors.text.primary }}>
                         {highlight.title}
                       </Typography>
-                      <Typography variant="body2" sx={{ mb: 3, color: colors.text.secondary, lineHeight: 1.6 }}>
+                      <Typography variant="body2" sx={{ mb: 3, color: colors.text.primary, lineHeight: 1.6 }}>
                         {highlight.description}
                       </Typography>
                       <Chip 
@@ -302,7 +303,7 @@ const LandingPage = () => {
         {/* Testimonials Section */}
         <Box sx={{ mt: 12, mb: 8 }}>
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.4 }}>
-            <Typography variant="h3" sx={{ textAlign: 'center', mb: 6, fontWeight: 700, color: colors.neutral.white, fontFamily: fancyFont }}>
+            <Typography variant="h3" sx={{ textAlign: 'center', mb: 6, fontWeight: 700, color: colors.text.primary, fontFamily: fancyFont }}>
               What Our Users Say
             </Typography>
           </motion.div>
@@ -329,14 +330,15 @@ const LandingPage = () => {
                       <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
                         <Box
                           component="img"
-                          src={testimonial.avatar}
+                          src={testimonial.avatar || 'https://ui-avatars.com/api/?name=Emma+L.&background=F9FAFB&color=222B45&size=128'}
                           alt={testimonial.name}
-                          sx={{ 
-                            width: 60, 
-                            height: 60, 
-                            borderRadius: '50%', 
+                          sx={{
+                            width: 60,
+                            height: 60,
+                            borderRadius: '50%',
                             mr: 2,
-                            objectFit: 'cover'
+                            objectFit: 'cover',
+                            background: colors.neutral.lightGray
                           }}
                         />
                         <Box>
@@ -348,7 +350,7 @@ const LandingPage = () => {
                           </Typography>
                         </Box>
                       </Box>
-                      <Typography variant="body1" sx={{ color: colors.text.secondary, lineHeight: 1.6, mb: 2 }}>
+                      <Typography variant="body1" sx={{ color: colors.text.primary, lineHeight: 1.6, mb: 2 }}>
                         "{testimonial.content}"
                       </Typography>
                       <Box sx={{ display: 'flex', gap: 0.5 }}>
@@ -367,7 +369,7 @@ const LandingPage = () => {
         {/* Pricing Section */}
         <Box sx={{ mt: 12, mb: 8 }}>
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.6 }}>
-            <Typography variant="h3" sx={{ textAlign: 'center', mb: 6, fontWeight: 700, color: colors.neutral.white, fontFamily: fancyFont }}>
+            <Typography variant="h3" sx={{ textAlign: 'center', mb: 6, fontWeight: 700, color: colors.text.primary, fontFamily: fancyFont }}>
               Simple, Transparent Pricing
             </Typography>
           </motion.div>
@@ -379,59 +381,77 @@ const LandingPage = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.7 }}
               >
-                <Card sx={{ 
-                  background: 'rgba(255,255,255,0.95)', 
+                <Card sx={{
+                  background: 'rgba(255,255,255,0.98)',
                   backdropFilter: 'blur(10px)',
                   borderRadius: 4,
-                  p: 4,
+                  p: 5,
                   textAlign: 'center',
                   position: 'relative',
-                  '&:hover': {
-                    transform: 'translateY(-8px)',
-                    boxShadow: '0 20px 40px rgba(0,0,0,0.15)'
-                  }
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  minHeight: 480,
+                  boxShadow: '0 8px 32px rgba(79,140,255,0.08)',
+                  justifyContent: 'space-between',
                 }}>
-                  <Typography variant="h4" sx={{ fontWeight: 700, color: colors.primary.main, mb: 2 }}>
-                    Free
-                  </Typography>
-                  <Typography variant="h2" sx={{ fontWeight: 900, color: colors.text.primary, mb: 1 }}>
-                    $0
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: colors.text.secondary, mb: 4 }}>
-                    Perfect for getting started
-                  </Typography>
-                  <List sx={{ mb: 4 }}>
-                    <ListItem sx={{ px: 0 }}>
-                      <ListItemIcon sx={{ minWidth: 32 }}>
-                        <Check sx={{ color: colors.success.main }} />
-                      </ListItemIcon>
-                      <ListItemText primary="Unlimited AI conversations" />
-                    </ListItem>
-                    <ListItem sx={{ px: 0 }}>
-                      <ListItemIcon sx={{ minWidth: 32 }}>
-                        <Check sx={{ color: colors.success.main }} />
-                      </ListItemIcon>
-                      <ListItemText primary="Basic mood tracking" />
-                    </ListItem>
-                    <ListItem sx={{ px: 0 }}>
-                      <ListItemIcon sx={{ minWidth: 32 }}>
-                        <Check sx={{ color: colors.success.main }} />
-                      </ListItemIcon>
-                      <ListItemText primary="Crisis support" />
-                    </ListItem>
-                  </List>
+                  <Box>
+                    <Typography variant="h4" sx={{ fontWeight: 700, color: colors.primary.main, mb: 2 }}>
+                      Free
+                    </Typography>
+                    <Typography variant="h2" sx={{ fontWeight: 900, color: colors.text.primary, mb: 1 }}>
+                      $0
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: colors.text.primary, mb: 4 }}>
+                      Perfect for getting started
+                    </Typography>
+                    <List sx={{ mb: 4 }}>
+                      <ListItem sx={{ px: 0 }}>
+                        <ListItemIcon sx={{ minWidth: 32 }}>
+                          <Check sx={{ color: colors.success.main }} />
+                        </ListItemIcon>
+                        <ListItemText primary="Limited AI Conversations" />
+                      </ListItem>
+                      <ListItem sx={{ px: 0 }}>
+                        <ListItemIcon sx={{ minWidth: 32 }}>
+                          <Check sx={{ color: colors.success.main }} />
+                        </ListItemIcon>
+                        <ListItemText primary="Basic Mood Tracking" />
+                      </ListItem>
+                      <ListItem sx={{ px: 0 }}>
+                        <ListItemIcon sx={{ minWidth: 32 }}>
+                          <Check sx={{ color: colors.success.main }} />
+                        </ListItemIcon>
+                        <ListItemText primary="Crisis Support" />
+                      </ListItem>
+                      <ListItem sx={{ px: 0 }}>
+                        <ListItemIcon sx={{ minWidth: 32 }}>
+                          <Check sx={{ color: colors.success.main }} />
+                        </ListItemIcon>
+                        <ListItemText primary="Basic Analytics" />
+                      </ListItem>
+                      <ListItem sx={{ px: 0 }}>
+                        <ListItemIcon sx={{ minWidth: 32 }}>
+                          <Check sx={{ color: colors.success.main }} />
+                        </ListItemIcon>
+                        <ListItemText primary="Community Support" />
+                      </ListItem>
+                    </List>
+                  </Box>
                   <Button
-                    variant="outlined"
+                    variant="contained"
                     fullWidth
                     onClick={handleShowSignUp}
                     sx={{
-                      borderColor: colors.primary.main,
-                      color: colors.primary.main,
-                      '&:hover': {
-                        borderColor: colors.primary.dark,
-                        background: colors.primary.main,
-                        color: colors.neutral.white
-                      }
+                      background: colors.gradients.primary,
+                      color: colors.primary.contrastText,
+                      fontWeight: 700,
+                      fontSize: '1.1rem',
+                      borderRadius: 3,
+                      py: 1.5,
+                      boxShadow: 3,
+                      fontFamily: fancyFont,
+                      '&:hover': { background: colors.gradients.secondary, color: colors.neutral.darkGray }
                     }}
                   >
                     Get Started Free
@@ -446,75 +466,95 @@ const LandingPage = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.8 }}
               >
-                <Card sx={{ 
-                  background: 'rgba(255,255,255,0.95)', 
+                <Card sx={{
+                  background: 'rgba(255,255,255,0.98)',
                   backdropFilter: 'blur(10px)',
                   borderRadius: 4,
-                  p: 4,
+                  p: 5,
                   textAlign: 'center',
                   position: 'relative',
-                  border: `2px solid ${colors.primary.main}`,
-                  '&:hover': {
-                    transform: 'translateY(-8px)',
-                    boxShadow: '0 20px 40px rgba(0,0,0,0.15)'
-                  }
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  minHeight: 480,
+                  boxShadow: '0 8px 32px rgba(79,140,255,0.08)',
+                  justifyContent: 'space-between',
                 }}>
-                  <Chip 
-                    label="Most Popular" 
-                    sx={{ 
-                      position: 'absolute', 
-                      top: -12, 
-                      left: '50%', 
+                  <Chip
+                    label="Most Popular"
+                    sx={{
+                      position: 'absolute',
+                      top: 20,
+                      left: '50%',
                       transform: 'translateX(-50%)',
                       background: colors.primary.main,
-                      color: colors.neutral.white,
-                      fontWeight: 600
-                    }} 
+                      color: colors.primary.contrastText,
+                      fontWeight: 600,
+                      fontSize: '1rem',
+                      zIndex: 2,
+                      px: 2,
+                      py: 1
+                    }}
                   />
-                  <Typography variant="h4" sx={{ fontWeight: 700, color: colors.primary.main, mb: 2 }}>
-                    Premium
-                  </Typography>
-                  <Typography variant="h2" sx={{ fontWeight: 900, color: colors.text.primary, mb: 1 }}>
-                    $9.99
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: colors.text.secondary, mb: 4 }}>
-                    per month
-                  </Typography>
-                  <List sx={{ mb: 4 }}>
-                    <ListItem sx={{ px: 0 }}>
-                      <ListItemIcon sx={{ minWidth: 32 }}>
-                        <Check sx={{ color: colors.success.main }} />
-                      </ListItemIcon>
-                      <ListItemText primary="Everything in Free" />
-                    </ListItem>
-                    <ListItem sx={{ px: 0 }}>
-                      <ListItemIcon sx={{ minWidth: 32 }}>
-                        <Check sx={{ color: colors.success.main }} />
-                      </ListItemIcon>
-                      <ListItemText primary="Advanced analytics" />
-                    </ListItem>
-                    <ListItem sx={{ px: 0 }}>
-                      <ListItemIcon sx={{ minWidth: 32 }}>
-                        <Check sx={{ color: colors.success.main }} />
-                      </ListItemIcon>
-                      <ListItemText primary="Priority support" />
-                    </ListItem>
-                    <ListItem sx={{ px: 0 }}>
-                      <ListItemIcon sx={{ minWidth: 32 }}>
-                        <Check sx={{ color: colors.success.main }} />
-                      </ListItemIcon>
-                      <ListItemText primary="Custom wellness plans" />
-                    </ListItem>
-                  </List>
+                  <Box sx={{ mt: 5 }}>
+                    <Typography variant="h4" sx={{ fontWeight: 700, color: colors.primary.main, mb: 2 }}>
+                      Premium
+                    </Typography>
+                    <Typography variant="h2" sx={{ fontWeight: 900, color: colors.text.primary, mb: 1 }}>
+                      $9.99
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: colors.text.primary, mb: 4 }}>
+                      per month
+                    </Typography>
+                    <List sx={{ mb: 4 }}>
+                      <ListItem sx={{ px: 0, alignItems: 'flex-start' }}>
+                        <ListItemIcon sx={{ minWidth: 32, mt: 0.5 }}>
+                          <Check sx={{ color: colors.success.main }} />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={<span><b>Custom Voice Conversion</b><br /><span style={{ fontWeight: 400 }}>Transform your text or mood into a unique, supportive AI voice experience.</span></span>}
+                        />
+                      </ListItem>
+                      <ListItem sx={{ px: 0, alignItems: 'flex-start' }}>
+                        <ListItemIcon sx={{ minWidth: 32, mt: 0.5 }}>
+                          <Check sx={{ color: colors.success.main }} />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={<span><b>Personalised AI Call Conversation</b><br /><span style={{ fontWeight: 400 }}>Schedule and receive AI-powered wellness calls tailored to your needs.</span></span>}
+                        />
+                      </ListItem>
+                      <ListItem sx={{ px: 0, alignItems: 'flex-start' }}>
+                        <ListItemIcon sx={{ minWidth: 32, mt: 0.5 }}>
+                          <Check sx={{ color: colors.success.main }} />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={<span><b>Custom Well-being Plan</b><br /><span style={{ fontWeight: 400 }}>Get a plan designed for your unique mental health journey.</span></span>}
+                        />
+                      </ListItem>
+                      <ListItem sx={{ px: 0, alignItems: 'flex-start' }}>
+                        <ListItemIcon sx={{ minWidth: 32, mt: 0.5 }}>
+                          <Check sx={{ color: colors.success.main }} />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={<span><b>Advanced Analytics</b><br /><span style={{ fontWeight: 400 }}>Deep insights and trends to help you grow and thrive.</span></span>}
+                        />
+                      </ListItem>
+                    </List>
+                  </Box>
                   <Button
                     variant="contained"
                     fullWidth
                     onClick={handleShowSignUp}
                     sx={{
                       background: colors.gradients.primary,
-                      '&:hover': {
-                        background: colors.gradients.secondary
-                      }
+                      color: colors.primary.contrastText,
+                      fontWeight: 700,
+                      fontSize: '1.1rem',
+                      borderRadius: 3,
+                      py: 1.5,
+                      boxShadow: 3,
+                      fontFamily: fancyFont,
+                      '&:hover': { background: colors.gradients.secondary, color: colors.neutral.darkGray }
                     }}
                   >
                     Start Premium Trial
@@ -528,7 +568,7 @@ const LandingPage = () => {
         {/* Contact Section */}
         <Box sx={{ mt: 12, mb: 8 }}>
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.9 }}>
-            <Typography variant="h3" sx={{ textAlign: 'center', mb: 6, fontWeight: 700, color: colors.neutral.white, fontFamily: fancyFont }}>
+            <Typography variant="h3" sx={{ textAlign: 'center', mb: 6, fontWeight: 700, color: colors.text.primary, fontFamily: fancyFont }}>
               Get in Touch
             </Typography>
           </motion.div>
@@ -558,7 +598,7 @@ const LandingPage = () => {
                       <ListItemText 
                         primary="Email" 
                         secondary="support@mentalhealthbuddy.ai"
-                        secondaryTypographyProps={{ color: colors.text.secondary }}
+                        secondaryTypographyProps={{ color: colors.text.primary }}
                       />
                     </ListItem>
                     <ListItem sx={{ px: 0 }}>
@@ -568,7 +608,7 @@ const LandingPage = () => {
                       <ListItemText 
                         primary="Phone" 
                         secondary="+1 (555) 123-4567"
-                        secondaryTypographyProps={{ color: colors.text.secondary }}
+                        secondaryTypographyProps={{ color: colors.text.primary }}
                       />
                     </ListItem>
                     <ListItem sx={{ px: 0 }}>
@@ -578,7 +618,7 @@ const LandingPage = () => {
                       <ListItemText 
                         primary="Address" 
                         secondary="123 Wellness Street, Mental Health City, MH 12345"
-                        secondaryTypographyProps={{ color: colors.text.secondary }}
+                        secondaryTypographyProps={{ color: colors.text.primary }}
                       />
                     </ListItem>
                   </List>

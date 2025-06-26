@@ -22,6 +22,7 @@ import {
   Star
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
+import { colors } from '../theme';
 
 const Insights = () => {
   const [userStats, setUserStats] = useState({});
@@ -30,6 +31,12 @@ const Insights = () => {
   const [moodTrends, setMoodTrends] = useState([]);
   const [activityStats, setActivityStats] = useState({});
   const [recommendations, setRecommendations] = useState([]);
+  const [wellnessAreas, setWellnessAreas] = useState([
+    { name: 'Emotional', score: 0, icon: <EmojiEmotions />, color: colors.primary.main },
+    { name: 'Physical', score: 0, icon: <Favorite />, color: colors.error.main },
+    { name: 'Social', score: 0, icon: <Psychology />, color: colors.secondary.main },
+    { name: 'Spiritual', score: 0, icon: <Star />, color: colors.accent.main }
+  ]);
 
   useEffect(() => {
     loadUserInsights();
@@ -41,78 +48,67 @@ const Insights = () => {
       const response = await fetch('http://localhost:5000/user-stats/Akashpatel2609');
       const data = await response.json();
       setUserStats(data);
-      setWellnessScore(data.wellness_score || 72);
+      setWellnessScore(data.wellness_score ?? 0);
+      setWellnessAreas(data.wellness_areas ?? [
+        { name: 'Emotional', score: 0, icon: <EmojiEmotions />, color: colors.primary.main },
+        { name: 'Physical', score: 0, icon: <Favorite />, color: colors.error.main },
+        { name: 'Social', score: 0, icon: <Psychology />, color: colors.secondary.main },
+        { name: 'Spiritual', score: 0, icon: <Star />, color: colors.accent.main }
+      ]);
+      setConversationStats(data.conversation_stats ?? {
+        totalMessages: 0,
+        averageResponseTime: '0s',
+        conversationStreak: 0,
+        longestConversation: 0,
+        favoriteTopics: []
+      });
+      setMoodTrends(data.mood_trends ?? []);
+      setActivityStats(data.activity_stats ?? {
+        totalActivities: 0,
+        completedThisWeek: 0,
+        favoriteActivity: '',
+        completionRate: 0,
+        weeklyGoal: 0
+      });
+      setRecommendations(data.recommendations ?? []);
     } catch (error) {
       console.error('Error loading user insights:', error);
-      // Fallback data
       setUserStats({
-        total_conversations: 45,
-        activity_count: 12,
-        emotions_count: { happiness: 15, calm: 12, neutral: 10, sadness: 5, anxiety: 3 },
-        most_common_emotion: 'happiness'
+        total_conversations: 0,
+        activity_count: 0,
+        emotions_count: {},
+        most_common_emotion: ''
       });
-      setWellnessScore(72);
+      setWellnessScore(0);
+      setWellnessAreas([
+        { name: 'Emotional', score: 0, icon: <EmojiEmotions />, color: colors.primary.main },
+        { name: 'Physical', score: 0, icon: <Favorite />, color: colors.error.main },
+        { name: 'Social', score: 0, icon: <Psychology />, color: colors.secondary.main },
+        { name: 'Spiritual', score: 0, icon: <Star />, color: colors.accent.main }
+      ]);
+      setConversationStats({
+        totalMessages: 0,
+        averageResponseTime: '0s',
+        conversationStreak: 0,
+        longestConversation: 0,
+        favoriteTopics: []
+      });
+      setMoodTrends([]);
+      setActivityStats({
+        totalActivities: 0,
+        completedThisWeek: 0,
+        favoriteActivity: '',
+        completionRate: 0,
+        weeklyGoal: 0
+      });
+      setRecommendations([]);
     }
-
-    // Set conversation stats
-    setConversationStats({
-      totalMessages: 156,
-      averageResponseTime: '2.3s',
-      conversationStreak: 7,
-      longestConversation: 23,
-      favoriteTopics: ['Stress Management', 'Self-Care', 'Relationships']
-    });
-
-    // Set mood trends
-    setMoodTrends([
-      { day: 'Mon', score: 4.2, mood: 'happy' },
-      { day: 'Tue', score: 3.8, mood: 'calm' },
-      { day: 'Wed', score: 4.5, mood: 'happy' },
-      { day: 'Thu', score: 3.2, mood: 'neutral' },
-      { day: 'Fri', score: 4.1, mood: 'happy' },
-      { day: 'Sat', score: 4.3, mood: 'happy' },
-      { day: 'Sun', score: 3.9, mood: 'calm' }
-    ]);
-
-    // Set activity stats
-    setActivityStats({
-      totalActivities: 12,
-      completedThisWeek: 5,
-      favoriteActivity: 'Breathing Exercise',
-      completionRate: 83,
-      weeklyGoal: 7
-    });
-
-    // Set recommendations
-    setRecommendations([
-      {
-        type: 'improvement',
-        title: 'Increase Physical Activity',
-        description: 'Your physical wellness score is lower than other areas. Try adding 30 minutes of exercise to your routine.',
-        icon: <Favorite />,
-        color: '#4caf50'
-      },
-      {
-        type: 'maintenance',
-        title: 'Keep Up the Great Work',
-        description: 'Your emotional wellness is excellent! Continue practicing gratitude and mindfulness.',
-        icon: <EmojiEmotions />,
-        color: '#2196f3'
-      },
-      {
-        type: 'goal',
-        title: 'Complete Weekly Challenge',
-        description: 'You\'re 2 activities away from completing this week\'s wellness challenge.',
-        icon: <Star />,
-        color: '#ff9800'
-      }
-    ]);
   };
 
   const getWellnessColor = (score) => {
-    if (score >= 80) return '#4caf50';
-    if (score >= 60) return '#ff9800';
-    return '#f44336';
+    if (score >= 80) return colors.primary.main;
+    if (score >= 60) return colors.accent.main;
+    return colors.error.main;
   };
 
   const getWellnessLabel = (score) => {
@@ -120,13 +116,6 @@ const Insights = () => {
     if (score >= 60) return 'Good';
     return 'Needs Attention';
   };
-
-  const wellnessAreas = [
-    { name: 'Emotional', score: 85, icon: <EmojiEmotions />, color: '#4caf50' },
-    { name: 'Physical', score: 68, icon: <Favorite />, color: '#f44336' },
-    { name: 'Social', score: 82, icon: <Psychology />, color: '#2196f3' },
-    { name: 'Spiritual', score: 71, icon: <Star />, color: '#9c27b0' }
-  ];
 
   return (
     <Box sx={{ p: 3, maxWidth: 1200, mx: 'auto' }}>
@@ -137,10 +126,10 @@ const Insights = () => {
         transition={{ duration: 0.6 }}
       >
         <Box sx={{ mb: 4, textAlign: 'center' }}>
-          <Typography variant="h3" sx={{ fontWeight: 700, color: '#667eea', mb: 1 }}>
+          <Typography variant="h3" sx={{ fontWeight: 700, color: colors.text.primary, mb: 1 }}>
             📊 Insights & Analytics
           </Typography>
-          <Typography variant="h6" sx={{ color: '#888', fontWeight: 400 }}>
+          <Typography variant="h6" sx={{ color: colors.text.secondary, fontWeight: 400 }}>
             Discover patterns and track your mental wellness journey
           </Typography>
         </Box>
@@ -156,8 +145,8 @@ const Insights = () => {
           >
             <Card sx={{ 
               height: '100%', 
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              color: 'white'
+              background: colors.gradients.primary,
+              color: colors.primary.contrastText
             }}>
               <CardContent sx={{ p: 4, textAlign: 'center' }}>
                 <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
@@ -223,45 +212,51 @@ const Insights = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <Card sx={{ height: '100%', background: 'linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%)' }}>
+            <Card sx={{ height: '100%', background: colors.gradients.secondary }}>
               <CardContent sx={{ p: 4 }}>
-                <Typography variant="h5" sx={{ fontWeight: 600, color: '#667eea', mb: 3 }}>
+                <Typography variant="h5" sx={{ fontWeight: 600, color: colors.text.primary, mb: 3 }}>
                   Wellness Areas Breakdown
                 </Typography>
                 
-                {wellnessAreas.map((area, index) => (
-                  <Box key={area.name} sx={{ mb: 3 }}>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                        <Box sx={{ color: area.color, mr: 2 }}>
-                          {area.icon}
+                {wellnessAreas.length === 0 || wellnessAreas.every(a => a.score === 0) ? (
+                  <Box sx={{ textAlign: 'center', py: 6 }}>
+                    <Typography variant="body1" color="text.secondary">No wellness area data yet.</Typography>
+                  </Box>
+                ) : (
+                  wellnessAreas.map((area, index) => (
+                    <Box key={area.name} sx={{ mb: 3 }}>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                          <Box sx={{ color: area.color, mr: 2 }}>
+                            {area.icon}
+                          </Box>
+                          <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                            {area.name}
+                          </Typography>
                         </Box>
-                        <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                          {area.name}
+                        <Typography variant="body2" sx={{ color: colors.text.secondary, fontWeight: 600 }}>
+                          {area.score}/100
                         </Typography>
                       </Box>
-                      <Typography variant="body2" sx={{ color: '#888', fontWeight: 600 }}>
-                        {area.score}/100
-                      </Typography>
+                      <LinearProgress
+                        variant="determinate"
+                        value={area.score}
+                        sx={{
+                          height: 10,
+                          borderRadius: 5,
+                          bgcolor: colors.neutral.gray,
+                          '& .MuiLinearProgress-bar': {
+                            bgcolor: area.color,
+                            borderRadius: 5
+                          }
+                        }}
+                      />
                     </Box>
-                    <LinearProgress
-                      variant="determinate"
-                      value={area.score}
-                      sx={{
-                        height: 10,
-                        borderRadius: 5,
-                        bgcolor: 'rgba(102,126,234,0.1)',
-                        '& .MuiLinearProgress-bar': {
-                          bgcolor: area.color,
-                          borderRadius: 5
-                        }
-                      }}
-                    />
-                  </Box>
-                ))}
+                  ))
+                )}
                 
-                <Box sx={{ mt: 4, p: 2, bgcolor: 'rgba(102,126,234,0.1)', borderRadius: 2 }}>
-                  <Typography variant="body2" sx={{ color: '#667eea', fontWeight: 500 }}>
+                <Box sx={{ mt: 4, p: 2, bgcolor: colors.primary.light, borderRadius: 2 }}>
+                  <Typography variant="body2" sx={{ color: colors.text.primary, fontWeight: 500 }}>
                     💡 Focus on improving your Physical wellness to boost your overall score
                   </Typography>
                 </Box>
@@ -277,49 +272,49 @@ const Insights = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
           >
-            <Card sx={{ height: '100%', background: 'linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%)' }}>
+            <Card sx={{ height: '100%', background: colors.gradients.secondary }}>
               <CardContent sx={{ p: 4 }}>
-                <Typography variant="h5" sx={{ fontWeight: 600, color: '#667eea', mb: 3 }}>
+                <Typography variant="h5" sx={{ fontWeight: 600, color: colors.text.primary, mb: 3 }}>
                   Conversation Analytics
                 </Typography>
                 
                 <Grid container spacing={2}>
                   <Grid item xs={6}>
-                    <Box sx={{ textAlign: 'center', p: 2, bgcolor: 'white', borderRadius: 2 }}>
-                      <Typography variant="h4" sx={{ fontWeight: 700, color: '#667eea' }}>
+                    <Box sx={{ textAlign: 'center', p: 2, bgcolor: colors.neutral.white, borderRadius: 2 }}>
+                      <Typography variant="h4" sx={{ fontWeight: 700, color: colors.text.primary }}>
                         {conversationStats.totalMessages}
                       </Typography>
-                      <Typography variant="body2" sx={{ color: '#888' }}>
+                      <Typography variant="body2" sx={{ color: colors.text.secondary }}>
                         Total Messages
                       </Typography>
                     </Box>
                   </Grid>
                   <Grid item xs={6}>
-                    <Box sx={{ textAlign: 'center', p: 2, bgcolor: 'white', borderRadius: 2 }}>
-                      <Typography variant="h4" sx={{ fontWeight: 700, color: '#4caf50' }}>
+                    <Box sx={{ textAlign: 'center', p: 2, bgcolor: colors.neutral.white, borderRadius: 2 }}>
+                      <Typography variant="h4" sx={{ fontWeight: 700, color: colors.primary.main }}>
                         {conversationStats.conversationStreak}
                       </Typography>
-                      <Typography variant="body2" sx={{ color: '#888' }}>
+                      <Typography variant="body2" sx={{ color: colors.text.secondary }}>
                         Day Streak
                       </Typography>
                     </Box>
                   </Grid>
                   <Grid item xs={6}>
-                    <Box sx={{ textAlign: 'center', p: 2, bgcolor: 'white', borderRadius: 2 }}>
-                      <Typography variant="h4" sx={{ fontWeight: 700, color: '#ff9800' }}>
+                    <Box sx={{ textAlign: 'center', p: 2, bgcolor: colors.neutral.white, borderRadius: 2 }}>
+                      <Typography variant="h4" sx={{ fontWeight: 700, color: colors.accent.main }}>
                         {conversationStats.averageResponseTime}
                       </Typography>
-                      <Typography variant="body2" sx={{ color: '#888' }}>
+                      <Typography variant="body2" sx={{ color: colors.text.secondary }}>
                         Avg Response
                       </Typography>
                     </Box>
                   </Grid>
                   <Grid item xs={6}>
-                    <Box sx={{ textAlign: 'center', p: 2, bgcolor: 'white', borderRadius: 2 }}>
-                      <Typography variant="h4" sx={{ fontWeight: 700, color: '#9c27b0' }}>
+                    <Box sx={{ textAlign: 'center', p: 2, bgcolor: colors.neutral.white, borderRadius: 2 }}>
+                      <Typography variant="h4" sx={{ fontWeight: 700, color: colors.accent.dark }}>
                         {conversationStats.longestConversation}
                       </Typography>
-                      <Typography variant="body2" sx={{ color: '#888' }}>
+                      <Typography variant="body2" sx={{ color: colors.text.secondary }}>
                         Longest Chat
                       </Typography>
                     </Box>
@@ -327,18 +322,22 @@ const Insights = () => {
                 </Grid>
                 
                 <Box sx={{ mt: 3 }}>
-                  <Typography variant="h6" sx={{ fontWeight: 600, color: '#667eea', mb: 2 }}>
+                  <Typography variant="h6" sx={{ fontWeight: 600, color: colors.text.primary, mb: 2 }}>
                     Favorite Topics
                   </Typography>
                   <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                    {conversationStats.favoriteTopics?.map((topic, index) => (
-                      <Chip
-                        key={index}
-                        label={topic}
-                        size="small"
-                        sx={{ bgcolor: 'rgba(102,126,234,0.1)', color: '#667eea' }}
-                      />
-                    ))}
+                    {conversationStats.favoriteTopics && conversationStats.favoriteTopics.length > 0 ? (
+                      conversationStats.favoriteTopics.map((topic, index) => (
+                        <Chip
+                          key={index}
+                          label={topic}
+                          size="small"
+                          sx={{ bgcolor: colors.primary.light, color: colors.text.primary }}
+                        />
+                      ))
+                    ) : (
+                      <Typography variant="body2" color="text.secondary">No topics yet.</Typography>
+                    )}
                   </Box>
                 </Box>
               </CardContent>
@@ -353,42 +352,46 @@ const Insights = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
           >
-            <Card sx={{ height: '100%', background: 'linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%)' }}>
+            <Card sx={{ height: '100%', background: colors.gradients.secondary }}>
               <CardContent sx={{ p: 4 }}>
-                <Typography variant="h5" sx={{ fontWeight: 600, color: '#667eea', mb: 3 }}>
+                <Typography variant="h5" sx={{ fontWeight: 600, color: colors.text.primary, mb: 3 }}>
                   Weekly Mood Trends
                 </Typography>
                 
                 <Box sx={{ mb: 3 }}>
-                  {moodTrends.map((day, index) => (
-                    <Box key={day.day} sx={{ mb: 2 }}>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-                        <Typography variant="body2" sx={{ fontWeight: 500, minWidth: 40 }}>
-                          {day.day}
-                        </Typography>
-                        <Typography variant="body2" sx={{ color: '#888', fontWeight: 600 }}>
-                          {day.score}/5
-                        </Typography>
+                  {moodTrends.length === 0 ? (
+                    <Typography variant="body2" color="text.secondary">No mood trends yet.</Typography>
+                  ) : (
+                    moodTrends.map((day, index) => (
+                      <Box key={day.day} sx={{ mb: 2 }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                          <Typography variant="body2" sx={{ fontWeight: 500, minWidth: 40 }}>
+                            {day.day}
+                          </Typography>
+                          <Typography variant="body2" sx={{ color: colors.text.secondary, fontWeight: 600 }}>
+                            {day.score}/5
+                          </Typography>
+                        </Box>
+                        <LinearProgress
+                          variant="determinate"
+                          value={(day.score / 5) * 100}
+                          sx={{
+                            height: 8,
+                            borderRadius: 4,
+                            bgcolor: colors.neutral.gray,
+                            '& .MuiLinearProgress-bar': {
+                              bgcolor: day.score >= 4 ? colors.primary.main : day.score >= 3 ? colors.accent.main : colors.error.main,
+                              borderRadius: 4
+                            }
+                          }}
+                        />
                       </Box>
-                      <LinearProgress
-                        variant="determinate"
-                        value={(day.score / 5) * 100}
-                        sx={{
-                          height: 8,
-                          borderRadius: 4,
-                          bgcolor: 'rgba(102,126,234,0.1)',
-                          '& .MuiLinearProgress-bar': {
-                            bgcolor: day.score >= 4 ? '#4caf50' : day.score >= 3 ? '#ff9800' : '#f44336',
-                            borderRadius: 4
-                          }
-                        }}
-                      />
-                    </Box>
-                  ))}
+                    ))
+                  )}
                 </Box>
                 
-                <Box sx={{ p: 2, bgcolor: 'rgba(76,175,80,0.1)', borderRadius: 2 }}>
-                  <Typography variant="body2" sx={{ color: '#4caf50', fontWeight: 500 }}>
+                <Box sx={{ p: 2, bgcolor: colors.primary.light, borderRadius: 2 }}>
+                  <Typography variant="body2" sx={{ color: colors.primary.main, fontWeight: 500 }}>
                     📈 Your mood has been consistently positive this week!
                   </Typography>
                 </Box>
@@ -404,9 +407,9 @@ const Insights = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.5 }}
           >
-            <Card sx={{ height: '100%', background: 'linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%)' }}>
+            <Card sx={{ height: '100%', background: colors.gradients.secondary }}>
               <CardContent sx={{ p: 4 }}>
-                <Typography variant="h5" sx={{ fontWeight: 600, color: '#667eea', mb: 3 }}>
+                <Typography variant="h5" sx={{ fontWeight: 600, color: colors.text.primary, mb: 3 }}>
                   Activity Statistics
                 </Typography>
                 
@@ -418,10 +421,10 @@ const Insights = () => {
                       size={80}
                       thickness={6}
                       sx={{
-                        color: 'rgba(102,126,234,0.1)',
+                        color: colors.neutral.gray,
                         '& .MuiCircularProgress-circle': {
                           strokeLinecap: 'round',
-                          color: '#4caf50'
+                          color: colors.primary.main
                         }
                       }}
                     />
@@ -437,7 +440,7 @@ const Insights = () => {
                         justifyContent: 'center',
                       }}
                     >
-                      <Typography variant="h6" sx={{ fontWeight: 700, color: '#4caf50' }}>
+                      <Typography variant="h6" sx={{ fontWeight: 700, color: colors.primary.main }}>
                         {activityStats.completionRate}%
                       </Typography>
                     </Box>
@@ -446,7 +449,7 @@ const Insights = () => {
                     <Typography variant="h6" sx={{ fontWeight: 600 }}>
                       Completion Rate
                     </Typography>
-                    <Typography variant="body2" sx={{ color: '#888' }}>
+                    <Typography variant="body2" sx={{ color: colors.text.secondary }}>
                       {activityStats.completedThisWeek}/{activityStats.weeklyGoal} this week
                     </Typography>
                   </Box>
@@ -456,15 +459,19 @@ const Insights = () => {
                   <Typography variant="body1" sx={{ fontWeight: 500, mb: 1 }}>
                     Favorite Activity
                   </Typography>
-                  <Chip
-                    label={activityStats.favoriteActivity}
-                    icon={<Favorite />}
-                    sx={{ bgcolor: 'rgba(76,175,80,0.1)', color: '#4caf50' }}
-                  />
+                  {activityStats.favoriteActivity ? (
+                    <Chip
+                      label={activityStats.favoriteActivity}
+                      icon={<Favorite />}
+                      sx={{ bgcolor: colors.primary.light, color: colors.primary.main }}
+                    />
+                  ) : (
+                    <Typography variant="body2" color="text.secondary">No activity yet.</Typography>
+                  )}
                 </Box>
                 
-                <Box sx={{ p: 2, bgcolor: 'rgba(102,126,234,0.1)', borderRadius: 2 }}>
-                  <Typography variant="body2" sx={{ color: '#667eea', fontWeight: 500 }}>
+                <Box sx={{ p: 2, bgcolor: colors.primary.light, borderRadius: 2 }}>
+                  <Typography variant="body2" sx={{ color: colors.text.primary, fontWeight: 500 }}>
                     🎯 You're on track to complete your weekly goal!
                   </Typography>
                 </Box>
@@ -480,43 +487,47 @@ const Insights = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.6 }}
           >
-            <Card sx={{ height: '100%', background: 'linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%)' }}>
+            <Card sx={{ height: '100%', background: colors.gradients.secondary }}>
               <CardContent sx={{ p: 4 }}>
-                <Typography variant="h5" sx={{ fontWeight: 600, color: '#667eea', mb: 3 }}>
+                <Typography variant="h5" sx={{ fontWeight: 600, color: colors.text.primary, mb: 3 }}>
                   Personalized Recommendations
                 </Typography>
                 
                 <List>
-                  {recommendations.map((rec, index) => (
-                    <ListItem key={index} sx={{ px: 0, mb: 2 }}>
-                      <ListItemIcon>
-                        <Avatar sx={{ bgcolor: rec.color, width: 40, height: 40 }}>
-                          {rec.icon}
-                        </Avatar>
-                      </ListItemIcon>
-                      <ListItemText
-                        primary={
-                          <Typography variant="body1" sx={{ fontWeight: 600, color: '#333' }}>
-                            {rec.title}
-                          </Typography>
-                        }
-                        secondary={
-                          <Typography variant="body2" sx={{ color: '#666', mt: 0.5 }}>
-                            {rec.description}
-                          </Typography>
-                        }
-                      />
-                    </ListItem>
-                  ))}
+                  {recommendations.length === 0 ? (
+                    <Typography variant="body2" color="text.secondary" sx={{ px: 2, py: 2 }}>No recommendations yet.</Typography>
+                  ) : (
+                    recommendations.map((rec, index) => (
+                      <ListItem key={index} sx={{ px: 0, mb: 2 }}>
+                        <ListItemIcon>
+                          <Avatar sx={{ bgcolor: rec.color, width: 40, height: 40 }}>
+                            {rec.icon}
+                          </Avatar>
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={
+                            <Typography variant="body1" sx={{ fontWeight: 600, color: colors.text.primary }}>
+                              {rec.title}
+                            </Typography>
+                          }
+                          secondary={
+                            <Typography variant="body2" sx={{ color: colors.text.secondary, mt: 0.5 }}>
+                              {rec.description}
+                            </Typography>
+                          }
+                        />
+                      </ListItem>
+                    ))
+                  )}
                 </List>
                 
                 <Box sx={{ mt: 3, textAlign: 'center' }}>
                   <Button
                     variant="outlined"
                     sx={{
-                      borderColor: '#667eea',
-                      color: '#667eea',
-                      '&:hover': { borderColor: '#5a6fd8', bgcolor: 'rgba(102,126,234,0.05)' }
+                      borderColor: colors.primary.main,
+                      color: colors.primary.main,
+                      '&:hover': { borderColor: colors.primary.dark, bgcolor: colors.primary.light }
                     }}
                   >
                     View All Recommendations
