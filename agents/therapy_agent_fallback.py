@@ -4,46 +4,62 @@ from datetime import datetime
 
 class TherapyAgentFallback:
     def __init__(self):
-        self.empathetic_responses = {
+        """Initialize therapeutic responses based on evidence-based practices"""
+        self.therapeutic_responses = {
             'sadness': [
-                "I can hear the pain in your words, {username}. It's completely understandable to feel this way. Sometimes life feels overwhelming, and that's okay. Would you like to talk about what's been weighing on your heart?",
-                "Thank you for sharing something so personal with me. Sadness can feel so heavy, but you're not alone in this. I'm here to listen without judgment. What's been the hardest part for you lately?",
-                "I notice you're going through a difficult time. Your feelings are completely valid, and it takes courage to reach out. Sometimes just acknowledging our pain is the first step. How long have you been feeling this way?"
+                "I can hear the sadness in what you're sharing, {username}, and I want to validate how difficult this must be for you. Depression and sadness often carry important information about losses or unmet needs in our lives. I'm curious - what thoughts tend to go through your mind when you're feeling this low? Sometimes our thinking patterns can intensify our emotional pain.",
+                
+                "Thank you for trusting me with these vulnerable feelings, {username}. Sadness is one of our most human emotions, and it often signals that something meaningful to us has been affected. When you notice this sadness arising, what does your inner voice tend to tell you about yourself or your situation? I'm wondering if we might explore some of those thoughts together.",
+                
+                "I notice you're carrying some heavy emotions right now, {username}. In my experience, sadness often comes with a story our minds tell us about why we're feeling this way. Help me understand - what meaning are you making of this difficult time? Sometimes when we examine these stories, we can find new perspectives that feel more balanced and helpful."
             ],
+            
             'anxiety': [
-                "I can sense you're feeling overwhelmed right now, {username}. Anxiety can make everything feel so much bigger and scarier. Let's take this one moment at a time. Can you tell me what's been triggering these feelings?",
-                "Anxiety can be exhausting, and I want you to know that what you're experiencing is real and valid. You're safe right now, in this moment. Would it help to try a simple breathing exercise together?",
-                "I hear that you're feeling anxious. Sometimes our minds race with 'what if' thoughts. Remember, you've gotten through difficult times before, and you can get through this too. What usually helps you feel more grounded?"
+                "I can sense the anxiety and worry in what you're telling me, {username}. Anxiety often involves our mind trying to solve problems by thinking through every possible scenario, which can feel exhausting. What I'm curious about is - what specific thoughts or images go through your mind when you notice the anxiety building? Understanding your thought patterns can be the first step in managing anxiety more effectively.",
+                
+                "It sounds like you're experiencing a lot of worry and tension, {username}. One thing I often notice with anxiety is that our minds can get caught in 'what if' thinking - imagining all the things that could go wrong. I'm wondering, when you're feeling anxious, how much of your worry is about things that are actually happening right now versus things you're imagining might happen?",
+                
+                "I hear how overwhelming the anxiety feels for you, {username}. Sometimes anxiety can make our world feel very small and threatening. I'm curious - when you think about the situations that make you most anxious, what is it that you're most afraid might happen? And what evidence do you have that this fear is realistic versus your anxiety talking?"
             ],
+            
             'anger': [
-                "I can feel the frustration in your message, {username}. It's completely normal to feel angry sometimes - it often means something important to you has been affected. What's been building up this anger for you?",
-                "Anger can be such a powerful emotion, and it's okay to feel it. Sometimes it's our way of protecting ourselves or standing up for what matters. I'm here to listen. What's been making you feel this way?",
-                "I hear your frustration, and I want you to know it's valid. Anger often covers up other emotions like hurt or disappointment. When you're ready, I'd like to understand what's really going on for you."
+                "I can feel the anger and frustration in your words, {username}. Anger is often a secondary emotion that protects other, more vulnerable feelings underneath - sometimes hurt, disappointment, or feeling powerless. I'm curious, when you think about what's making you angry, what other emotions might be there as well? What would it look like to honor both the anger and what's beneath it?",
+                
+                "It sounds like you're feeling really frustrated and perhaps unheard, {username}. Anger often signals that one of our important values or boundaries has been crossed. Help me understand - what feels most unfair or wrong about your situation? What would need to happen for you to feel that your needs were being respected?",
+                
+                "I hear the intensity of your anger, {username}, and I want you to know that feeling angry doesn't make you a bad person. Often anger is our psyche's way of saying 'this isn't okay' or 'I deserve better.' What I'm curious about is - if this anger could speak, what would it most want the people in your life to understand about your experience?"
             ],
-            'loneliness': [
-                "Feeling lonely can be one of the hardest emotions to bear, {username}. I want you to know that even though it feels like you're alone, you're not. I'm here with you right now. Can you tell me more about what's making you feel isolated?",
-                "Loneliness can make the world feel so empty and quiet. But you reached out today, and that shows incredible strength. You matter, and your feelings matter. What's been making you feel most alone lately?",
-                "I hear how lonely you're feeling, and I want you to know that this feeling, while painful, is temporary. You're worthy of connection and love. Sometimes reaching out, like you're doing now, is the first step. How can I best support you today?"
-            ],
+            
             'fear': [
-                "I can sense the fear in your words, {username}. Fear can make everything feel uncertain and scary. You're brave for sharing this with me. What's been causing you to feel afraid?",
-                "Fear is such a human emotion, and it's okay to feel scared sometimes. It often means we care deeply about something. You're safe here with me. Can you help me understand what's been frightening you?",
-                "I hear that you're feeling afraid. Fear can feel overwhelming, but remember that you don't have to face it alone. I'm here to listen and support you. What would feel most helpful right now?"
+                "I can hear the fear in what you're sharing, {username}, and I want to acknowledge how vulnerable it feels to be afraid. Fear often arises when we perceive a threat to something we value deeply. I'm curious - when you imagine the thing you're most afraid of happening, what would that mean about you or your life? Sometimes exploring the meaning behind our fears can help us understand them better.",
+                
+                "Fear can make the world feel very unsafe and unpredictable, {username}. One thing I often explore with clients is the difference between realistic concerns and anxiety-driven fears. When you think about what you're afraid of, how likely is it to actually happen? And if it did happen, what resources and strengths do you have to cope with it?",
+                
+                "I notice you're dealing with some significant fears, {username}. Sometimes when we're afraid, our minds can get stuck in a pattern of trying to control or avoid the things that scare us. I'm wondering - what would it look like to acknowledge the fear while still moving toward the things that matter most to you? What small step might feel manageable today?"
             ],
+            
             'hopelessness': [
-                "I'm really glad you reached out, {username}. When we feel hopeless, it can seem like things will never get better, but feelings - even the strongest ones - do change. You've shown strength by being here. Can you tell me what's been making you feel this way?",
-                "I hear how hopeless you're feeling right now, and I want you to know that these feelings, while incredibly painful, are not permanent. You matter, and your life has value. What's been happening that's brought you to this point?",
-                "Hopelessness can feel like being in a dark tunnel with no light. But you're here, talking to me, and that's a sign of your strength. Sometimes we need to take things one moment at a time. How are you feeling right in this moment?"
+                "I'm really concerned about you, {username}, and I'm glad you reached out today. When we feel hopeless, it can seem like our current pain will last forever, but I want you to know that feelings, even the most intense ones, are temporary. Right now, in this moment, you're here talking with me, which shows incredible strength. What has kept you going, even when it feels impossible?",
+                
+                "The hopelessness you're describing sounds overwhelming, {username}. Sometimes when we're in deep emotional pain, our thinking can become very narrow - we can only see the problems and not the possibilities. I'm wondering, if a close friend were in your exact situation, what might you tell them? Sometimes we can offer ourselves the same compassion we'd give others.",
+                
+                "I hear how dark things feel for you right now, {username}. Hopelessness often comes when we feel trapped with no way forward. But you're here, which means part of you is still fighting, still hoping for something different. What would 'a little bit better' look like for you? We don't need to solve everything today - just take one small step toward something that matters to you."
             ],
+            
             'happiness': [
-                "I can hear the joy in your message, {username}! It's wonderful to share in your happiness. What's been bringing you this positive energy today?",
-                "It's so lovely to hear you feeling good, {username}. Happiness is precious, and I'm glad you're experiencing it. What's been going well for you?",
-                "Your positive energy is contagious! I'm so happy that you're feeling this way, {username}. What would you like to share about what's making you feel so good?"
+                "I love hearing the joy in what you're sharing, {username}! Positive emotions are just as important to explore as difficult ones. I'm curious - what thoughts or beliefs about yourself and your life are present when you feel this happy? Sometimes understanding what contributes to our well-being can help us cultivate more of these moments.",
+                
+                "It's wonderful to hear you feeling good, {username}. I often encourage clients to really savor these positive moments and notice what's contributing to them. What specifically about today or your current situation is bringing you this happiness? What does this tell you about what you value or what brings meaning to your life?",
+                
+                "Your positive energy is really coming through, {username}! When we're feeling good, it can be valuable to pause and reflect on what's working well. What strengths or qualities in yourself do you notice when you're feeling this way? How might you remember this feeling during more challenging times?"
             ],
+            
             'neutral': [
-                "Thank you for reaching out, {username}. I'm here to listen and support you in whatever way you need. How are you feeling today, and what's on your mind?",
-                "I'm glad you're here, {username}. Sometimes it's hard to know where to start, and that's completely okay. I'm here to listen without judgment. What would you like to talk about?",
-                "Hi {username}, I'm here for you. Whether you're having a good day or a difficult one, I want you to know that your feelings are valid. What's going on for you today?"
+                "Thank you for being here with me today, {username}. Sometimes the most important work happens in these quiet moments when we're not in crisis - just checking in with ourselves and being honest about our experience. What's been on your mind lately? What feels most important for you to explore or understand better right now?",
+                
+                "I appreciate you taking the time to connect, {username}. Even when things feel calm or neutral, there's often a lot happening beneath the surface. I'm curious - how would you describe your overall sense of well-being lately? What aspects of your life feel most balanced, and what areas might need more attention?",
+                
+                "I'm glad you're here, {username}. Sometimes the most meaningful conversations happen when we're not in a particular emotional state - just being present with whatever is true for us right now. What would be most helpful for you to talk about today? What questions or concerns have been in the background of your thoughts?"
             ]
         }
         
@@ -104,27 +120,44 @@ class TherapyAgentFallback:
         }
     
     def generate_empathetic_response(self, message: str, emotion_data: Dict, user_history: List = None, username: str = "Akashpatel2609") -> str:
-        """Generate empathetic response using predefined responses"""
+        """Generate therapeutic response using evidence-based approaches"""
         
         primary_emotion = emotion_data.get('primary_emotion', 'neutral')
         
-        # Get base response
-        responses = self.empathetic_responses.get(primary_emotion, self.empathetic_responses['neutral'])
-        base_response = random.choice(responses).format(username=username)
+        # Get appropriate therapeutic response
+        responses = self.therapeutic_responses.get(primary_emotion, self.therapeutic_responses['neutral'])
+        therapeutic_response = random.choice(responses).format(username=username)
         
-        # Add follow-up question occasionally
-        if random.random() < 0.7:  # 70% chance to add follow-up
-            follow_ups = self.follow_up_questions.get(primary_emotion, [])
-            if follow_ups:
-                follow_up = random.choice(follow_ups)
-                base_response += f"\n\n{follow_up}"
+        # Add therapeutic techniques based on emotion and message content
+        message_lower = message.lower()
         
-        # Add coping strategy occasionally for relevant emotions
-        if primary_emotion in self.coping_strategies and random.random() < 0.3:  # 30% chance
-            strategy = random.choice(self.coping_strategies[primary_emotion])
-            base_response += f"\n\nHere's something that might help: {strategy}"
+        # CBT-based interventions for negative thinking patterns
+        if any(word in message_lower for word in ['always', 'never', 'everyone', 'nobody', 'terrible', 'awful']):
+            cbt_addition = f"\n\nI notice you're using some very absolute language like 'always' or 'never.' Sometimes when we're struggling, our thinking can become very black-and-white. I'm wondering if there might be some middle ground or exceptions to explore here?"
+            therapeutic_response += cbt_addition
         
-        return base_response
+        # Mindfulness intervention for overwhelm
+        elif any(word in message_lower for word in ['overwhelmed', 'too much', 'can\'t handle', 'spinning']):
+            mindfulness_addition = f"\n\nIt sounds like you're feeling really overwhelmed right now. Sometimes when everything feels like too much, it can help to come back to this present moment. Right now, you're here, you're breathing, you're safe. What do you notice about your breathing or your body right now?"
+            therapeutic_response += mindfulness_addition
+        
+        # Strength-based intervention for hopelessness
+        elif any(word in message_lower for word in ['hopeless', 'can\'t do anything', 'useless', 'worthless']):
+            strength_addition = f"\n\nI hear how hopeless you're feeling, {username}. But I want to reflect back something I notice - you reached out today. You're here, communicating with me. That takes strength, even when it doesn't feel like it. What other small acts of courage or care have you shown recently, even if they seemed insignificant at the time?"
+            therapeutic_response += strength_addition
+        
+        # Behavioral activation for depression indicators
+        elif any(word in message_lower for word in ['no energy', 'don\'t want to', 'stay in bed', 'motivation']):
+            behavioral_addition = f"\n\nLack of energy and motivation are such common experiences when we're struggling. Sometimes the smallest actions can be the most meaningful. I'm wondering - is there one tiny thing you could do today just for yourself? It could be as simple as making a cup of tea or stepping outside for a moment."
+            therapeutic_response += behavioral_addition
+        
+        # Crisis assessment and safety
+        crisis_keywords = ['suicide', 'kill myself', 'end it all', 'no point living', 'want to die', 'better off dead']
+        if any(keyword in message_lower for keyword in crisis_keywords):
+            crisis_response = f"\n\nI'm really concerned about you right now, {username}. What you're sharing tells me you're in significant emotional pain. Before we continue, I need to check - are you having thoughts of hurting yourself? If you're in immediate danger, please call 911 or go to your nearest emergency room. The National Suicide Prevention Lifeline (988) is also available 24/7."
+            therapeutic_response = crisis_response
+        
+        return therapeutic_response
     
     def test_api_connection(self) -> bool:
         """Always returns True for fallback mode"""

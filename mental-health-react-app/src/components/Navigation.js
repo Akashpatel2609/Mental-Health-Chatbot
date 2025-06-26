@@ -32,9 +32,11 @@ import {
   Phone,
   Email,
   LocationOn,
-  Close
+  Close,
+  Favorite
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
+import { colors } from '../theme';
 
 const Navigation = ({ onShowSignIn, onShowSignUp, currentUser, onLogout }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -51,17 +53,17 @@ const Navigation = ({ onShowSignIn, onShowSignUp, currentUser, onLogout }) => {
 
   const features = [
     {
-      icon: <Psychology sx={{ fontSize: 30, color: '#667eea' }} />,
+      icon: <Psychology sx={{ fontSize: 30, color: colors.primary.main }} />,
       title: 'AI-Powered Therapy',
       description: 'Advanced Gemini 2.0 Flash AI provides empathetic, personalized conversations'
     },
     {
-      icon: <Support sx={{ fontSize: 30, color: '#e91e63' }} />,
+      icon: <Support sx={{ fontSize: 30, color: colors.error.main }} />,
       title: '24/7 Support',
       description: 'Available whenever you need someone to talk to, day or night'
     },
     {
-      icon: <Security sx={{ fontSize: 30, color: '#4caf50' }} />,
+      icon: <Security sx={{ fontSize: 30, color: colors.success.main }} />,
       title: 'Crisis Intervention',
       description: 'Immediate safety protocols and emergency resource access'
     }
@@ -115,31 +117,41 @@ const Navigation = ({ onShowSignIn, onShowSignUp, currentUser, onLogout }) => {
 
   return (
     <>
-      <AppBar position="fixed" sx={{ background: 'rgba(255, 255, 255, 0.95)', backdropFilter: 'blur(10px)' }}>
+      <AppBar position="fixed" sx={{ background: 'transparent', boxShadow: 'none' }}>
         <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1, color: '#333', fontWeight: 'bold' }}>
-            💙 Mental Health Buddy
+          <Typography variant="h4" component="div" sx={{ 
+            flexGrow: 1, 
+            color: colors.text.primary, 
+            fontWeight: 800, 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: 1.5,
+            fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
+            letterSpacing: '-0.5px'
+          }}>
+            <Favorite sx={{ color: colors.primary.main, fontSize: 36 }} />
+            MIRA
           </Typography>
           
           {!isMobile && (
             <Box sx={{ display: 'flex', gap: 2 }}>
               <Button 
                 color="inherit" 
-                sx={{ color: '#333' }}
+                sx={{ color: colors.text.primary }}
                 onClick={() => setFeaturesOpen(true)}
               >
                 Features
               </Button>
               <Button 
                 color="inherit" 
-                sx={{ color: '#333' }}
+                sx={{ color: colors.text.primary }}
                 onClick={() => setAboutOpen(true)}
               >
                 About
               </Button>
               <Button 
                 color="inherit" 
-                sx={{ color: '#333' }}
+                sx={{ color: colors.text.primary }}
                 onClick={() => setSupportOpen(true)}
               >
                 Support
@@ -154,9 +166,13 @@ const Navigation = ({ onShowSignIn, onShowSignUp, currentUser, onLogout }) => {
                   variant="outlined" 
                   onClick={onShowSignIn}
                   sx={{ 
-                    borderColor: '#667eea', 
-                    color: '#667eea',
-                    '&:hover': { borderColor: '#5a6fd8' }
+                    borderColor: colors.primary.main, 
+                    color: colors.primary.main,
+                    '&:hover': { 
+                      borderColor: colors.primary.dark,
+                      background: colors.primary.main,
+                      color: colors.neutral.white
+                    }
                   }}
                 >
                   Sign In
@@ -165,8 +181,17 @@ const Navigation = ({ onShowSignIn, onShowSignUp, currentUser, onLogout }) => {
                   variant="contained" 
                   onClick={onShowSignUp}
                   sx={{ 
-                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                    '&:hover': { background: 'linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%)' }
+                    background: 'linear-gradient(135deg, #1B4F1B 0%, #2C5F2D 100%)',
+                    color: colors.neutral.white,
+                    fontWeight: 700,
+                    fontSize: '0.95rem',
+                    px: 3,
+                    py: 1.2,
+                    '&:hover': { 
+                      background: 'linear-gradient(135deg, #0F3A0F 0%, #1B4F1B 100%)',
+                      transform: 'translateY(-1px)',
+                      boxShadow: '0 6px 20px rgba(27, 79, 27, 0.4)'
+                    }
                   }}
                 >
                   Get Started
@@ -175,22 +200,16 @@ const Navigation = ({ onShowSignIn, onShowSignUp, currentUser, onLogout }) => {
             ) : (
               <>
                 <Button 
-                  variant="contained" 
-                  onClick={() => window.location.href = `http://localhost:5000?user=${currentUser.username}`}
-                  sx={{ 
-                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                    '&:hover': { background: 'linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%)' }
-                  }}
-                >
-                  Continue Session
-                </Button>
-                <Button 
                   variant="outlined" 
                   onClick={onLogout}
                   sx={{ 
-                    borderColor: '#e91e63', 
-                    color: '#e91e63',
-                    '&:hover': { borderColor: '#c2185b' }
+                    borderColor: colors.error.main, 
+                    color: colors.error.main,
+                    '&:hover': { 
+                      borderColor: colors.error.dark,
+                      background: colors.error.main,
+                      color: colors.neutral.white
+                    }
                   }}
                 >
                   Sign Out
@@ -205,7 +224,7 @@ const Navigation = ({ onShowSignIn, onShowSignUp, currentUser, onLogout }) => {
               aria-label="open drawer"
               edge="start"
               onClick={handleDrawerToggle}
-              sx={{ ml: 1, color: '#333' }}
+              sx={{ ml: 1, color: colors.text.primary }}
             >
               <MenuIcon />
             </IconButton>
@@ -218,10 +237,16 @@ const Navigation = ({ onShowSignIn, onShowSignUp, currentUser, onLogout }) => {
         variant="temporary"
         open={mobileOpen}
         onClose={handleDrawerToggle}
-        ModalProps={{ keepMounted: true }}
+        ModalProps={{
+          keepMounted: true,
+        }}
         sx={{
           display: { xs: 'block', md: 'none' },
-          '& .MuiDrawer-paper': { boxSizing: 'border-box', width: 250 },
+          '& .MuiDrawer-paper': { 
+            boxSizing: 'border-box', 
+            width: 250,
+            background: colors.background.sidebar
+          },
         }}
       >
         {drawer}
@@ -234,39 +259,53 @@ const Navigation = ({ onShowSignIn, onShowSignUp, currentUser, onLogout }) => {
         maxWidth="md"
         fullWidth
       >
-        <DialogTitle sx={{ textAlign: 'center', fontWeight: 'bold' }}>
-          Features
+        <DialogTitle sx={{ 
+          background: colors.gradients.primary, 
+          color: colors.neutral.white,
+          fontWeight: 600
+        }}>
+          Platform Features
+          <IconButton
+            aria-label="close"
+            onClick={() => setFeaturesOpen(false)}
+            sx={{
+              position: 'absolute',
+              right: 8,
+              top: 8,
+              color: colors.neutral.white,
+            }}
+          >
+            <Close />
+          </IconButton>
         </DialogTitle>
-        <DialogContent>
+        <DialogContent sx={{ p: 3 }}>
           <Grid container spacing={3}>
             {features.map((feature, index) => (
               <Grid item xs={12} md={4} key={index}>
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                >
-                  <Card sx={{ height: '100%', textAlign: 'center' }}>
-                    <CardContent>
-                      <Box sx={{ mb: 2 }}>
-                        {feature.icon}
-                      </Box>
-                      <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>
-                        {feature.title}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        {feature.description}
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                </motion.div>
+                <Card sx={{ 
+                  height: '100%', 
+                  textAlign: 'center',
+                  transition: 'transform 0.3s ease',
+                  '&:hover': {
+                    transform: 'translateY(-4px)'
+                  }
+                }}>
+                  <CardContent sx={{ p: 3 }}>
+                    <Box sx={{ mb: 2 }}>
+                      {feature.icon}
+                    </Box>
+                    <Typography variant="h6" sx={{ mb: 2, fontWeight: 600, color: colors.text.primary }}>
+                      {feature.title}
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: colors.text.secondary }}>
+                      {feature.description}
+                    </Typography>
+                  </CardContent>
+                </Card>
               </Grid>
             ))}
           </Grid>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setFeaturesOpen(false)}>Close</Button>
-        </DialogActions>
       </Dialog>
 
       {/* About Dialog */}
@@ -276,47 +315,54 @@ const Navigation = ({ onShowSignIn, onShowSignUp, currentUser, onLogout }) => {
         maxWidth="md"
         fullWidth
       >
-        <DialogTitle sx={{ textAlign: 'center', fontWeight: 'bold' }}>
+        <DialogTitle sx={{ 
+          background: colors.gradients.primary, 
+          color: colors.neutral.white,
+          fontWeight: 600
+        }}>
           About Mental Health Buddy
+          <IconButton
+            aria-label="close"
+            onClick={() => setAboutOpen(false)}
+            sx={{
+              position: 'absolute',
+              right: 8,
+              top: 8,
+              color: colors.neutral.white,
+            }}
+          >
+            <Close />
+          </IconButton>
         </DialogTitle>
-        <DialogContent>
-          <Typography variant="body1" sx={{ mb: 3 }}>
-            Mental Health Buddy is an AI-powered mental health companion designed to provide 
-            empathetic support, crisis intervention, and therapeutic activities to help improve 
-            your mental wellness journey.
-          </Typography>
-          
-          <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>
+        <DialogContent sx={{ p: 3 }}>
+          <Typography variant="h6" sx={{ mb: 2, fontWeight: 600, color: colors.text.primary }}>
             Our Mission
           </Typography>
-          <Typography variant="body2" sx={{ mb: 3 }}>
-            To make mental health support accessible, available 24/7, and personalized to each 
-            individual's needs. We believe everyone deserves compassionate support on their 
-            mental wellness journey.
+          <Typography variant="body1" sx={{ mb: 3, color: colors.text.secondary, lineHeight: 1.6 }}>
+            Mental Health Buddy is dedicated to providing accessible, compassionate mental health support through advanced AI technology. 
+            We believe everyone deserves access to mental wellness resources, and our platform is designed to be a safe, supportive space 
+            for emotional well-being.
           </Typography>
-
-          <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>
+          
+          <Typography variant="h6" sx={{ mb: 2, fontWeight: 600, color: colors.text.primary }}>
+            What We Offer
+          </Typography>
+          <Typography variant="body1" sx={{ mb: 3, color: colors.text.secondary, lineHeight: 1.6 }}>
+            • 24/7 AI-powered conversations with empathetic responses<br/>
+            • Advanced mood tracking and emotional analytics<br/>
+            • Crisis intervention and emergency resource access<br/>
+            • Interactive wellness activities and exercises<br/>
+            • Community support and peer connections
+          </Typography>
+          
+          <Typography variant="h6" sx={{ mb: 2, fontWeight: 600, color: colors.text.primary }}>
             Technology
           </Typography>
-          <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 3 }}>
-            <Chip label="Gemini 2.0 Flash AI" color="primary" />
-            <Chip label="ElevenLabs Voice" color="secondary" />
-            <Chip label="React Frontend" color="default" />
-            <Chip label="Flask Backend" color="default" />
-          </Box>
-
-          <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>
-            Safety & Privacy
-          </Typography>
-          <Typography variant="body2">
-            Your privacy and safety are our top priorities. All conversations are private and 
-            secure. We include crisis detection and immediate access to emergency resources 
-            when needed.
+          <Typography variant="body1" sx={{ color: colors.text.secondary, lineHeight: 1.6 }}>
+            Built with cutting-edge AI technology including Gemini 2.0 Flash, our platform provides intelligent, 
+            context-aware responses while maintaining the highest standards of privacy and security.
           </Typography>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setAboutOpen(false)}>Close</Button>
-        </DialogActions>
       </Dialog>
 
       {/* Support Dialog */}
@@ -326,66 +372,82 @@ const Navigation = ({ onShowSignIn, onShowSignUp, currentUser, onLogout }) => {
         maxWidth="md"
         fullWidth
       >
-        <DialogTitle sx={{ textAlign: 'center', fontWeight: 'bold' }}>
+        <DialogTitle sx={{ 
+          background: colors.gradients.primary, 
+          color: colors.neutral.white,
+          fontWeight: 600
+        }}>
           Support & Resources
+          <IconButton
+            aria-label="close"
+            onClick={() => setSupportOpen(false)}
+            sx={{
+              position: 'absolute',
+              right: 8,
+              top: 8,
+              color: colors.neutral.white,
+            }}
+          >
+            <Close />
+          </IconButton>
         </DialogTitle>
-        <DialogContent>
-          <Typography variant="body1" sx={{ mb: 3 }}>
-            If you're in crisis or need immediate support, please use these resources:
-          </Typography>
-          
+        <DialogContent sx={{ p: 3 }}>
           <Grid container spacing={3}>
             {supportOptions.map((option, index) => (
               <Grid item xs={12} md={4} key={index}>
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                >
-                  <Card sx={{ height: '100%', textAlign: 'center' }}>
-                    <CardContent>
-                      <Box sx={{ mb: 2 }}>
-                        {option.icon}
-                      </Box>
-                      <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>
-                        {option.title}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                        {option.content}
-                      </Typography>
-                      <Button 
-                        variant="contained" 
-                        size="small"
-                        sx={{ 
-                          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                          '&:hover': { background: 'linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%)' }
-                        }}
-                      >
-                        {option.action}
-                      </Button>
-                    </CardContent>
-                  </Card>
-                </motion.div>
+                <Card sx={{ 
+                  height: '100%',
+                  transition: 'transform 0.3s ease',
+                  '&:hover': {
+                    transform: 'translateY(-4px)'
+                  }
+                }}>
+                  <CardContent sx={{ p: 3, textAlign: 'center' }}>
+                    <Box sx={{ mb: 2, color: colors.primary.main }}>
+                      {option.icon}
+                    </Box>
+                    <Typography variant="h6" sx={{ mb: 2, fontWeight: 600, color: colors.text.primary }}>
+                      {option.title}
+                    </Typography>
+                    <Typography variant="body2" sx={{ mb: 3, color: colors.text.secondary }}>
+                      {option.content}
+                    </Typography>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      sx={{
+                        borderColor: colors.primary.main,
+                        color: colors.primary.main,
+                        '&:hover': {
+                          borderColor: colors.primary.dark,
+                          background: colors.primary.main,
+                          color: colors.neutral.white
+                        }
+                      }}
+                    >
+                      {option.action}
+                    </Button>
+                  </CardContent>
+                </Card>
               </Grid>
             ))}
           </Grid>
-
-          <Typography variant="h6" sx={{ mt: 4, mb: 2, fontWeight: 'bold' }}>
-            Additional Resources
-          </Typography>
-          <Typography variant="body2" sx={{ mb: 2 }}>
-            • National Alliance on Mental Illness (NAMI): 1-800-950-NAMI
-          </Typography>
-          <Typography variant="body2" sx={{ mb: 2 }}>
-            • Substance Abuse and Mental Health Services Administration: 1-800-662-4357
-          </Typography>
-          <Typography variant="body2" sx={{ mb: 2 }}>
-            • Veterans Crisis Line: 1-800-273-8255
-          </Typography>
+          
+          <Box sx={{ mt: 4, p: 3, background: colors.gradients.warm, borderRadius: 2 }}>
+            <Typography variant="h6" sx={{ mb: 2, fontWeight: 600, color: colors.text.primary }}>
+              Emergency Support
+            </Typography>
+            <Typography variant="body1" sx={{ mb: 2, color: colors.text.secondary }}>
+              If you're experiencing a mental health crisis or having thoughts of self-harm, please reach out immediately:
+            </Typography>
+            <Typography variant="h6" sx={{ color: colors.error.main, fontWeight: 700 }}>
+              988 - National Suicide Prevention Lifeline
+            </Typography>
+            <Typography variant="body2" sx={{ color: colors.error.main, fontWeight: 600 }}>
+              Available 24/7 • Free and Confidential
+            </Typography>
+          </Box>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setSupportOpen(false)}>Close</Button>
-        </DialogActions>
       </Dialog>
     </>
   );

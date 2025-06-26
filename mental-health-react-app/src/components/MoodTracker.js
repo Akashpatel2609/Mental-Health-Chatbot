@@ -17,7 +17,14 @@ import {
   ListItemText,
   LinearProgress,
   ToggleButton,
-  ToggleButtonGroup
+  ToggleButtonGroup,
+  TextField,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  useTheme,
+  useMediaQuery
 } from '@mui/material';
 import {
   Mood,
@@ -31,23 +38,30 @@ import {
   EmojiEmotions,
   Psychology,
   Timeline,
-  CheckCircle
+  CheckCircle,
+  Add,
+  Close,
+  Edit
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 
 const MoodTracker = () => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const [moodDialog, setMoodDialog] = useState(false);
   const [selectedMood, setSelectedMood] = useState(null);
+  const [moodNote, setMoodNote] = useState('');
   const [moodHistory, setMoodHistory] = useState([]);
+  const [editingMood, setEditingMood] = useState(null);
   const [weeklyMoods, setWeeklyMoods] = useState([]);
   const [moodInsights, setMoodInsights] = useState({});
 
   const moodOptions = [
-    { emoji: '😊', label: 'Happy', value: 'happy', color: '#4caf50', score: 5 },
-    { emoji: '😌', label: 'Calm', value: 'calm', color: '#2196f3', score: 4 },
-    { emoji: '😐', label: 'Neutral', value: 'neutral', color: '#ff9800', score: 3 },
-    { emoji: '😔', label: 'Sad', value: 'sad', color: '#9c27b0', score: 2 },
-    { emoji: '😰', label: 'Anxious', value: 'anxious', color: '#f44336', score: 1 },
-    { emoji: '😡', label: 'Angry', value: 'angry', color: '#d32f2f', score: 1 }
+    { value: 5, label: 'Excellent', icon: <SentimentSatisfied />, color: '#4caf50', emoji: '😊' },
+    { value: 4, label: 'Good', icon: <SentimentSatisfied />, color: '#8bc34a', emoji: '🙂' },
+    { value: 3, label: 'Okay', icon: <SentimentNeutral />, color: '#ffc107', emoji: '😐' },
+    { value: 2, label: 'Bad', icon: <SentimentDissatisfied />, color: '#ff9800', emoji: '😔' },
+    { value: 1, label: 'Terrible', icon: <SentimentDissatisfied />, color: '#f44336', emoji: '😢' }
   ];
 
   useEffect(() => {
@@ -90,35 +104,91 @@ const MoodTracker = () => {
     setMoodInsights(insights);
   };
 
-  const handleMoodSelect = (mood) => {
-    setSelectedMood(mood);
-    // Here you would typically save to backend
-    console.log('Selected mood:', mood);
-  };
-
-  const handleSaveMood = () => {
-    if (!selectedMood) return;
-    
-    const newEntry = {
-      date: new Date().toISOString().split('T')[0],
-      mood: selectedMood.value,
-      note: `Feeling ${selectedMood.label.toLowerCase()} today`,
-      timestamp: new Date().toISOString()
-    };
-    
-    setMoodHistory(prev => [newEntry, ...prev]);
+  const openMoodDialog = () => {
+    setMoodDialog(true);
     setSelectedMood(null);
+    setMoodNote('');
   };
 
-  const getMoodColor = (moodValue) => {
-    const mood = moodOptions.find(m => m.value === moodValue);
+  const closeMoodDialog = () => {
+    setMoodDialog(false);
+    setSelectedMood(null);
+    setMoodNote('');
+    setEditingMood(null);
+  };
+
+  const selectMood = (mood) => {
+    setSelectedMood(mood);
+  };
+
+  const saveMood = () => {
+    if (!selectedMood) return;
+
+    const newMoodEntry = {
+      id: editingMood ? editingMood.id : Date.now(),
+      mood: selectedMood,
+      note: moodNote,
+      timestamp: new Date().toISOString(),
+      date: new Date().toLocaleDateString()
+    };
+
+    if (editingMood) {
+      // Update existing mood entry
+      setMoodHistory(prev => 
+        prev.map(entry => 
+          entry.id === editingMood.id ? newMoodEntry : entry
+        )
+      );
+    } else {
+      // Add new mood entry
+      setMoodHistory(prev => [newMoodEntry, ...prev]);
+    }
+
+    closeMoodDialog();
+  };
+
+  const editMood = (moodEntry) => {
+    setEditingMood(moodEntry);
+    setSelectedMood(moodEntry.mood);
+    setMoodNote(moodEntry.note);
+    setMoodDialog(true);
+  };
+
+  const deleteMood = (moodId) => {
+    setMoodHistory(prev => prev.filter(entry => entry.id !== moodId));
+  };
+
+  const getMoodStats = () => {
+    if (moodHistory.length === 0) return { average: 0, trend: 'neutral', total: 0 };
+
+    const recentMoods = moodHistory.slice(0, 7); // Last 7 entries
+    const average = recentMoods.reduce((sum, entry) => sum + entry.mood.value, 0) / recentMoods.length;
+    
+    let trend = 'neutral';
+    if (recentMoods.length >= 2) {
+      const firstAvg = moodHistory.slice(-7, -3).reduce((sum, entry) => sum + entry.mood.value, 0) / 4;
+      const secondAvg = recentMoods.slice(0, 4).reduce((sum, entry) => sum + entry.mood.value, 0) / 4;
+      trend = secondAvg > firstAvg ? 'improving' : secondAvg < firstAvg ? 'declining' : 'stable';
+    }
+
+    return {
+      average: Math.round(average * 10) / 10,
+      trend,
+      total: moodHistory.length
+    };
+  };
+
+  const getMoodColor = (value) => {
+    const mood = moodOptions.find(m => m.value === value);
     return mood ? mood.color : '#ccc';
   };
 
-  const getMoodEmoji = (moodValue) => {
-    const mood = moodOptions.find(m => m.value === moodValue);
+  const getMoodEmoji = (value) => {
+    const mood = moodOptions.find(m => m.value === value);
     return mood ? mood.emoji : '😐';
   };
+
+  const moodStats = getMoodStats();
 
   return (
     <Box sx={{ p: 3, maxWidth: 1200, mx: 'auto' }}>
@@ -181,7 +251,7 @@ const MoodTracker = () => {
                       >
                         <Button
                           variant={selectedMood?.value === mood.value ? 'contained' : 'outlined'}
-                          onClick={() => handleMoodSelect(mood)}
+                          onClick={() => selectMood(mood)}
                           sx={{
                             width: '100%',
                             height: 80,
@@ -212,7 +282,7 @@ const MoodTracker = () => {
 
                 <Button
                   variant="contained"
-                  onClick={handleSaveMood}
+                  onClick={openMoodDialog}
                   disabled={!selectedMood}
                   startIcon={<CheckCircle />}
                   sx={{
@@ -223,7 +293,7 @@ const MoodTracker = () => {
                   }}
                   fullWidth
                 >
-                  Save Today's Mood
+                  Log Mood
                 </Button>
               </CardContent>
             </Card>
@@ -305,7 +375,7 @@ const MoodTracker = () => {
                         Average Mood
                       </Typography>
                       <Typography variant="h4" sx={{ fontWeight: 600, color: '#4caf50' }}>
-                        {moodInsights.averageMood}/5
+                        {moodStats.average}
                       </Typography>
                     </Box>
                   </Box>
@@ -319,7 +389,7 @@ const MoodTracker = () => {
                         Most Frequent Mood
                       </Typography>
                       <Typography variant="h6" sx={{ fontWeight: 600, color: '#9c27b0' }}>
-                        {getMoodEmoji(moodInsights.mostFrequentMood)} {moodInsights.mostFrequentMood}
+                        {getMoodEmoji(moodStats.mostFrequentMood)} {moodStats.mostFrequentMood}
                       </Typography>
                     </Box>
                   </Box>
@@ -333,7 +403,7 @@ const MoodTracker = () => {
                         Current Streak
                       </Typography>
                       <Typography variant="h6" sx={{ fontWeight: 600, color: '#ff9800' }}>
-                        {moodInsights.moodStreak} days
+                        {moodStats.moodStreak} days
                       </Typography>
                     </Box>
                   </Box>
@@ -341,7 +411,7 @@ const MoodTracker = () => {
 
                 <Box sx={{ p: 2, bgcolor: 'rgba(76,175,80,0.1)', borderRadius: 2 }}>
                   <Typography variant="body2" sx={{ color: '#4caf50', fontWeight: 500 }}>
-                    🎉 {moodInsights.improvement} improvement this month!
+                    🎉 {moodStats.improvement} improvement this month!
                   </Typography>
                 </Box>
               </CardContent>
@@ -378,11 +448,11 @@ const MoodTracker = () => {
                       }}>
                         <ListItemIcon>
                           <Avatar sx={{ 
-                            bgcolor: getMoodColor(entry.mood),
+                            bgcolor: getMoodColor(entry.mood.value),
                             width: 40,
                             height: 40
                           }}>
-                            {getMoodEmoji(entry.mood)}
+                            {getMoodEmoji(entry.mood.value)}
                           </Avatar>
                         </ListItemIcon>
                         <ListItemText
@@ -396,11 +466,11 @@ const MoodTracker = () => {
                                 })}
                               </Typography>
                               <Chip
-                                label={entry.mood}
+                                label={entry.mood.label}
                                 size="small"
                                 sx={{ 
-                                  bgcolor: `${getMoodColor(entry.mood)}20`,
-                                  color: getMoodColor(entry.mood),
+                                  bgcolor: `${getMoodColor(entry.mood.value)}20`,
+                                  color: getMoodColor(entry.mood.value),
                                   fontWeight: 500
                                 }}
                               />
@@ -430,6 +500,86 @@ const MoodTracker = () => {
           </motion.div>
         </Grid>
       </Grid>
+
+      {/* Mood Logging Dialog */}
+      <Dialog 
+        open={moodDialog} 
+        onClose={closeMoodDialog}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle sx={{ background: selectedMood?.color || '#667eea', color: 'white' }}>
+          {editingMood ? 'Edit Mood Entry' : 'Log Your Mood'}
+        </DialogTitle>
+        <DialogContent sx={{ pt: 3 }}>
+          <Typography variant="body1" sx={{ mb: 3 }}>
+            {editingMood ? 'Update your mood entry:' : 'How are you feeling right now?'}
+          </Typography>
+          
+          {/* Mood Selection */}
+          <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+            Select Mood:
+          </Typography>
+          <Box sx={{ display: 'flex', gap: 1, mb: 3, flexWrap: 'wrap' }}>
+            {moodOptions.map((mood) => (
+              <motion.div
+                key={mood.value}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Button
+                  variant={selectedMood?.value === mood.value ? "contained" : "outlined"}
+                  onClick={() => selectMood(mood)}
+                  sx={{
+                    borderColor: mood.color,
+                    color: selectedMood?.value === mood.value ? 'white' : mood.color,
+                    background: selectedMood?.value === mood.value ? mood.color : 'transparent',
+                    '&:hover': { 
+                      borderColor: mood.color, 
+                      background: selectedMood?.value === mood.value ? mood.color : `${mood.color}10` 
+                    }
+                  }}
+                >
+                  <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <Typography variant="h4">{mood.emoji}</Typography>
+                    <Typography variant="caption">{mood.label}</Typography>
+                  </Box>
+                </Button>
+              </motion.div>
+            ))}
+          </Box>
+
+          {/* Mood Note */}
+          <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+            Add a note (optional):
+          </Typography>
+          <TextField
+            fullWidth
+            multiline
+            rows={3}
+            placeholder="What's on your mind? What influenced your mood today?"
+            value={moodNote}
+            onChange={(e) => setMoodNote(e.target.value)}
+            sx={{ mb: 2 }}
+          />
+        </DialogContent>
+        <DialogActions sx={{ p: 3 }}>
+          <Button onClick={closeMoodDialog}>
+            Cancel
+          </Button>
+          <Button 
+            variant="contained"
+            onClick={saveMood}
+            disabled={!selectedMood}
+            sx={{ 
+              background: selectedMood?.color || '#667eea',
+              '&:hover': { background: selectedMood?.color || '#5a6fd8' }
+            }}
+          >
+            {editingMood ? 'Update' : 'Save Mood'}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

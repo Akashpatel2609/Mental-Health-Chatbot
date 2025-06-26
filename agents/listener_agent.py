@@ -9,7 +9,8 @@ class ListenerAgent:
             'angry': ['angry', 'mad', 'furious', 'irritated', 'annoyed', 'frustrated', 'rage', 'hate', 'pissed'],
             'anxious': ['anxious', 'worried', 'nervous', 'scared', 'afraid', 'panic', 'stress', 'overwhelmed', 'fear'],
             'happy': ['happy', 'joy', 'excited', 'glad', 'cheerful', 'delighted', 'elated', 'pleased', 'content'],
-            'fear': ['terrified', 'frightened', 'scared', 'afraid', 'horrified', 'petrified', 'panic', 'dread']
+            'fear': ['terrified', 'frightened', 'scared', 'afraid', 'horrified', 'petrified', 'panic', 'dread'],
+            'not_well': ['not feeling well', 'not good', 'not okay', 'not fine', 'feeling bad', 'feeling terrible', 'feeling awful', 'unwell', 'sick', 'ill']
         }
         
         self.crisis_keywords = {

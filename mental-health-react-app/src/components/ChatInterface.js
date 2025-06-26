@@ -1,197 +1,103 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
   Box,
-  Container,
-  Paper,
   TextField,
-  IconButton,
   Typography,
   Avatar,
-  Chip,
-  Button,
-  Alert,
   CircularProgress,
-  AppBar,
-  Toolbar,
-  Menu,
-  MenuItem
+  IconButton,
 } from '@mui/material';
+import {
+  Send,
+  Psychology,
+} from '@mui/icons-material';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
-import SendIcon from '@mui/icons-material/Send';
-import MicIcon from '@mui/icons-material/Mic';
-import VolumeUpIcon from '@mui/icons-material/VolumeUp';
-import StopIcon from '@mui/icons-material/Stop';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import LogoutIcon from '@mui/icons-material/Logout';
 import axios from 'axios';
+import { colors } from '../theme';
 
-// Configure axios for your Flask backend
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+// Design tokens matching ChatGPT specifications with new color scheme
+const designVars = {
+  navHeight: 40,
+  inputHeight: 56,
+  border: colors.neutral.gray,
+  bg: colors.neutral.white,
+  inputBg: colors.neutral.lightGray,
+  userMsgBg: colors.gradients.cool,
+  inputBorder: colors.neutral.gray,
+  font: 'Inter, system-ui, sans-serif',
+  grayText: colors.text.secondary,
+  iconGray: colors.text.hint,
+  footerBg: colors.neutral.lightGray,
+};
 
-// Create axios instance with proper configuration
-const api = axios.create({
-  baseURL: API_BASE_URL,
-  timeout: 30000,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
-
-function ChatInterface() {
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
+const ChatInterface = () => {
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [isListening, setIsListening] = useState(false);
-  const [currentAudio, setCurrentAudio] = useState(null);
-  const [apiStatus, setApiStatus] = useState('checking');
-  const [crisisAlert, setCrisisAlert] = useState(null);
-  const [userMenuAnchor, setUserMenuAnchor] = useState(null);
   const messagesEndRef = useRef(null);
+  const { currentUser } = useAuth();
 
-  useEffect(() => {
-    // Add welcome message
-    setMessages([
-      {
-        id: 1,
-        content: `Hello ${user?.username}! I'm Mira, your mental health companion powered by Gemini 2.0 Flash AI. I'm here to listen, support, and chat with you about whatever is on your mind. How are you feeling today?`,
-        sender: 'bot',
-        timestamp: new Date().toISOString(),
-        emotion: 'positive'
-      }
-    ]);
-
-    // Test API connection
-    testApiConnection();
-  }, [user]);
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+  const API_BASE_URL = 'http://localhost:5000';
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const testApiConnection = async () => {
-    try {
-      console.log('Testing API connection to:', API_BASE_URL);
-      const response = await api.get('/test-api');
-      setApiStatus(response.data.api_working ? 'connected' : 'error');
-      console.log('API Status:', response.data);
-    } catch (error) {
-      console.error('API test failed:', error);
-      setApiStatus('error');
-    }
-  };
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   const sendMessage = async () => {
     if (!inputMessage.trim() || isLoading) return;
 
     const userMessage = {
       id: Date.now(),
-      content: inputMessage,
+      text: inputMessage,
       sender: 'user',
       timestamp: new Date().toISOString()
     };
 
     setMessages(prev => [...prev, userMessage]);
-    const messageToSend = inputMessage;
     setInputMessage('');
     setIsLoading(true);
 
     try {
-      console.log('Sending message to:', `${API_BASE_URL}/chat`);
-      const response = await api.post('/chat', {
-        message: messageToSend,
-        username: user?.username || 'Guest'
+      const token = localStorage.getItem('token');
+      // Prepare conversation history (last 10 messages, user and bot)
+      const history = messages.slice(-10).map(m => ({ sender: m.sender, text: m.text }));
+      const response = await axios.post(`${API_BASE_URL}/chat`, {
+        message: inputMessage,
+        history
+      }, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
       });
 
       const botMessage = {
         id: Date.now() + 1,
-        content: response.data.response,
+        text: response.data.response,
         sender: 'bot',
         timestamp: new Date().toISOString(),
         emotion: response.data.emotion_detected,
-        crisisLevel: response.data.crisis_level
+        sentiment: response.data.sentiment_score
       };
 
       setMessages(prev => [...prev, botMessage]);
-
-      // Handle crisis situations
-      if (response.data.crisis_level === 'high' || response.data.crisis_level === 'medium') {
-        setCrisisAlert({
-          level: response.data.crisis_level,
-          message: response.data.crisis_level === 'high' 
-            ? 'I notice you may be in distress. Please consider contacting emergency services (911) or the suicide prevention lifeline (988).'
-            : 'I hear that you\'re going through a difficult time. Remember that support is available.'
-        });
-      }
-
     } catch (error) {
-      console.error('Chat error:', error);
+      console.error('Error sending message:', error);
       const errorMessage = {
         id: Date.now() + 1,
-        content: `I'm having trouble connecting to the server right now, ${user?.username}. Please make sure your Flask backend is running on ${API_BASE_URL}. If you're in crisis, you can always call 911 or 988.`,
+        text: "I'm having trouble right now. Please try again in a moment.",
         sender: 'bot',
         timestamp: new Date().toISOString(),
-        emotion: 'supportive'
+        isError: true
       };
       setMessages(prev => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const playVoiceMessage = async (text, messageId) => {
-    try {
-      // Stop current audio if playing
-      if (currentAudio) {
-        currentAudio.pause();
-        setCurrentAudio(null);
-      }
-
-      const response = await api.post('/voice/generate', {
-        text: text,
-        username: user?.username || 'Guest',
-        voice_id: 'bella',
-        voice_style: 'empathetic'
-      });
-
-      if (response.data.success && response.data.audio_base64) {
-        // Convert base64 to audio blob
-        const audioBlob = base64ToBlob(response.data.audio_base64, 'audio/mpeg');
-        const audioUrl = URL.createObjectURL(audioBlob);
-        const audio = new Audio(audioUrl);
-
-        audio.addEventListener('ended', () => {
-          URL.revokeObjectURL(audioUrl);
-          setCurrentAudio(null);
-        });
-
-        setCurrentAudio(audio);
-        await audio.play();
-      }
-    } catch (error) {
-      console.error('Voice playback error:', error);
-      // Show user-friendly error
-      alert('Voice feature is not available. Please make sure your Flask backend is running with voice support.');
-    }
-  };
-
-  const base64ToBlob = (base64, mimeType) => {
-    const byteCharacters = atob(base64);
-    const byteNumbers = new Array(byteCharacters.length);
-    
-    for (let i = 0; i < byteCharacters.length; i++) {
-      byteNumbers[i] = byteCharacters.charCodeAt(i);
-    }
-    
-    const byteArray = new Uint8Array(byteNumbers);
-    return new Blob([byteArray], { type: mimeType });
   };
 
   const handleKeyPress = (e) => {
@@ -201,241 +107,266 @@ function ChatInterface() {
     }
   };
 
-  const handleUserMenuOpen = (event) => {
-    setUserMenuAnchor(event.currentTarget);
-  };
-
-  const handleUserMenuClose = () => {
-    setUserMenuAnchor(null);
-  };
-
-  const handleLogout = () => {
-    logout();
-    navigate('/');
-  };
-
-  const MessageBubble = ({ message }) => (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-      className={`message-container ${message.sender}`}
+  return (
+    <Box
+      sx={{
+        height: 'calc(100vh - 64px)', // Account for AppBar height
+        maxHeight: 'calc(100vh - 64px)', // Ensure it doesn't exceed viewport
+        bgcolor: designVars.bg,
+        fontFamily: designVars.font,
+        display: 'flex',
+        flexDirection: 'column',
+        fontSize: '16px',
+        overflow: 'hidden', // Prevent body scroll
+        position: 'relative',
+        width: '100%',
+        boxSizing: 'border-box', // Include padding in height calculation
+        alignItems: 'center', // Center the chat container
+        justifyContent: 'center', // Center vertically
+        '& *': {
+          boxSizing: 'border-box', // Ensure all child elements use border-box
+        },
+      }}
     >
+      {/* Main Chat Container - Centered */}
       <Box
         sx={{
+          width: '100%',
+          maxWidth: 900, // Slightly wider for better proportions
+          height: '100%',
+          maxHeight: 'calc(100vh - 80px)', // Account for AppBar + padding
           display: 'flex',
-          justifyContent: message.sender === 'user' ? 'flex-end' : 'flex-start',
-          mb: 2
+          flexDirection: 'column',
+          bgcolor: designVars.bg,
+          borderRadius: 3,
+          boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+          border: `1px solid ${designVars.border}`,
+          overflow: 'hidden',
+          mx: 2, // Add horizontal margin
         }}
       >
+        {/* Chat Canvas - Scrollable Area */}
         <Box
           sx={{
+            flex: 1,
+            width: '100%',
             display: 'flex',
-            flexDirection: message.sender === 'user' ? 'row-reverse' : 'row',
-            alignItems: 'flex-end',
-            maxWidth: '70%'
+            flexDirection: 'column',
+            overflowY: 'auto', // Only this area scrolls
+            overflowX: 'hidden',
+            pt: 3, // Add top padding
+            pb: 2, // Add bottom padding
+            px: 3, // Add horizontal padding
+            minHeight: 0, // Important for flex scrolling
           }}
         >
-          <Avatar
-            sx={{
-              width: 40,
-              height: 40,
-              mx: 1,
-              bgcolor: message.sender === 'user' ? 'primary.main' : 'grey.300'
-            }}
-          >
-            {message.sender === 'user' ? (
-              <AccountCircleIcon />
-            ) : (
-              '🤖'
-            )}
-          </Avatar>
-          
-          <Paper
-            elevation={2}
-            sx={{
-              p: 2,
-              bgcolor: message.sender === 'user' ? 'primary.main' : 'background.paper',
-              color: message.sender === 'user' ? 'white' : 'text.primary',
-              borderRadius: message.sender === 'user' ? '20px 20px 8px 20px' : '20px 20px 20px 8px'
-            }}
-          >
-            <Typography variant="body1">
-              {message.content}
-            </Typography>
-            
-            {message.sender === 'bot' && (
-              <Box sx={{ mt: 1, display: 'flex', gap: 1, alignItems: 'center' }}>
-                <IconButton
-                  size="small"
-                  onClick={() => playVoiceMessage(message.content, message.id)}
-                  sx={{ color: 'primary.main' }}
-                >
-                  <VolumeUpIcon fontSize="small" />
-                </IconButton>
-                {message.emotion && (
-                  <Chip 
-                    label={message.emotion} 
-                    size="small" 
-                    variant="outlined"
-                    sx={{ fontSize: '0.7rem' }}
-                  />
-                )}
-              </Box>
-            )}
-          </Paper>
-        </Box>
-      </Box>
-    </motion.div>
-  );
-
-  return (
-    <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
-      {/* Header */}
-      <AppBar position="static" sx={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
-        <Toolbar>
-          <Typography variant="h6" sx={{ flexGrow: 1 }}>
-            💙 Mental Health Companion
-          </Typography>
-          
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Chip 
-              label={apiStatus === 'connected' ? 'AI Connected' : apiStatus === 'checking' ? 'Checking...' : 'AI Offline'}
-              color={apiStatus === 'connected' ? 'success' : apiStatus === 'checking' ? 'default' : 'error'}
-              size="small"
-            />
-            
-            <Button
-              color="inherit"
-              onClick={handleUserMenuOpen}
-              startIcon={<AccountCircleIcon />}
+          {/* Welcome message when no messages */}
+          {messages.length === 0 && (
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                height: '100%',
+                textAlign: 'center',
+                color: colors.text.secondary,
+                gap: 2,
+              }}
             >
-              {user?.username}
-            </Button>
-            
-            <Menu
-              anchorEl={userMenuAnchor}
-              open={Boolean(userMenuAnchor)}
-              onClose={handleUserMenuClose}
-            >
-              <MenuItem onClick={handleLogout}>
-                <LogoutIcon sx={{ mr: 1 }} />
-                Logout
-              </MenuItem>
-            </Menu>
-          </Box>
-        </Toolbar>
-      </AppBar>
-
-      {/* Crisis Alert */}
-      <AnimatePresence>
-        {crisisAlert && (
-          <motion.div
-            initial={{ opacity: 0, y: -50 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -50 }}
-          >
-            <Alert 
-              severity={crisisAlert.level === 'high' ? 'error' : 'warning'}
-              onClose={() => setCrisisAlert(null)}
-              sx={{ m: 2 }}
-            >
-              <Typography variant="body2">
-                <strong>Crisis Resources:</strong> Emergency: 911 | Suicide Prevention: 988 | Crisis Text: Text HOME to 741741
+              <Avatar sx={{ width: 64, height: 64, bgcolor: colors.primary.main, mb: 2 }}>
+                <Psychology sx={{ fontSize: 32, color: colors.neutral.white }} />
+              </Avatar>
+              <Typography variant="h5" sx={{ fontWeight: 600, color: colors.text.primary }}>
+                Welcome to MIRA! 💙
               </Typography>
-            </Alert>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Connection Status */}
-      {apiStatus === 'error' && (
-        <Alert severity="warning" sx={{ m: 2 }}>
-          Cannot connect to Flask backend at {API_BASE_URL}. Please make sure your Flask server is running with: <code>python app.py</code>
-        </Alert>
-      )}
-
-      {/* Chat Messages */}
-      <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
-        <Container maxWidth="md">
-          {messages.map((message) => (
-            <MessageBubble key={message.id} message={message} />
-          ))}
-          
-          {isLoading && (
-            <Box sx={{ display: 'flex', justifyContent: 'flex-start', mb: 2 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Avatar sx={{ bgcolor: 'grey.300' }}>🤖</Avatar>
-                <Paper elevation={2} sx={{ p: 2, borderRadius: '20px 20px 20px 8px' }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <CircularProgress size={16} />
-                    <Typography variant="body2" color="text.secondary">
-                      Mira is typing...
-                    </Typography>
-                  </Box>
-                </Paper>
-              </Box>
+              <Typography variant="body1" sx={{ maxWidth: 400, lineHeight: 1.6 }}>
+                I'm here to listen, support, and help you on your mental health journey. 
+                Feel free to share what's on your mind.
+              </Typography>
             </Box>
           )}
-          
-          <div ref={messagesEndRef} />
-        </Container>
-      </Box>
 
-      {/* Input Area */}
-      <Paper elevation={3} sx={{ p: 2, m: 2, borderRadius: 3 }}>
-        <Box sx={{ display: 'flex', gap: 1, alignItems: 'flex-end' }}>
-          <TextField
-            fullWidth
-            multiline
-            maxRows={4}
-            variant="outlined"
-            placeholder="Type your message here..."
-            value={inputMessage}
-            onChange={(e) => setInputMessage(e.target.value)}
-            onKeyPress={handleKeyPress}
-            disabled={isLoading}
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                borderRadius: '25px',
-              }
-            }}
-          />
-          
-          <IconButton
-            color="primary"
-            disabled={isListening}
-            sx={{ mb: 0.5 }}
-            title="Voice input not implemented in this demo"
-          >
-            <MicIcon />
-          </IconButton>
-          
-          {currentAudio && (
-            <IconButton
-              color="secondary"
-              onClick={() => {
-                currentAudio.pause();
-                setCurrentAudio(null);
-              }}
-              sx={{ mb: 0.5 }}
+          <AnimatePresence>
+            {messages.map((message) => (
+              <motion.div
+                key={message.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+              >
+                {message.sender === 'bot' ? (
+                  // Assistant message (left-aligned)
+                  <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 3 }}>
+                    <Avatar sx={{ width: 36, height: 36, bgcolor: colors.primary.main, mr: 2, flexShrink: 0 }}>
+                      <Psychology sx={{ color: colors.neutral.white }} />
+                    </Avatar>
+                    <Box sx={{ flex: 1, minWidth: 0, maxWidth: '85%' }}>
+                      <Box
+                        sx={{
+                          minHeight: 44,
+                          bgcolor: designVars.bg,
+                          border: `1px solid ${designVars.border}`,
+                          borderRadius: 3,
+                          px: 3,
+                          py: 2.5,
+                          fontSize: 16,
+                          color: colors.text.primary,
+                          boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+                          whiteSpace: 'pre-wrap',
+                          lineHeight: 1.6,
+                          wordWrap: 'break-word',
+                        }}
+                      >
+                        {message.text}
+                      </Box>
+                    </Box>
+                  </Box>
+                ) : (
+                  // User message (right-aligned)
+                  <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 3, justifyContent: 'flex-end' }}>
+                    <Box sx={{ flex: 1, minWidth: 0, maxWidth: '85%', display: 'flex', justifyContent: 'flex-end' }}>
+                      <Box
+                        sx={{
+                          minHeight: 44,
+                          bgcolor: colors.primary.main,
+                          borderRadius: 3,
+                          px: 3,
+                          py: 2.5,
+                          fontSize: 16,
+                          color: colors.neutral.white,
+                          boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                          whiteSpace: 'pre-wrap',
+                          lineHeight: 1.6,
+                          wordWrap: 'break-word',
+                          textAlign: 'left',
+                          maxWidth: '100%',
+                        }}
+                      >
+                        {message.text}
+                      </Box>
+                    </Box>
+                  </Box>
+                )}
+              </motion.div>
+            ))}
+          </AnimatePresence>
+
+          {/* Loading indicator */}
+          {isLoading && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
             >
-              <StopIcon />
-            </IconButton>
+              <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 3 }}>
+                <Avatar sx={{ width: 36, height: 36, bgcolor: colors.primary.main, mr: 2, flexShrink: 0 }}>
+                  <Psychology sx={{ color: colors.neutral.white }} />
+                </Avatar>
+                <Box sx={{ flex: 1, minWidth: 0, maxWidth: '85%' }}>
+                  <Box
+                    sx={{
+                      minHeight: 44,
+                      bgcolor: designVars.bg,
+                      border: `1px solid ${designVars.border}`,
+                      borderRadius: 3,
+                      px: 3,
+                      py: 2.5,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 1,
+                      boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+                    }}
+                  >
+                    <CircularProgress size={16} sx={{ color: colors.primary.main }} />
+                    <Typography sx={{ color: colors.text.secondary, fontSize: 14 }}>
+                      MIRA is thinking...
+                    </Typography>
+                  </Box>
+                </Box>
+              </Box>
+            </motion.div>
           )}
-          
-          <IconButton
-            color="primary"
-            onClick={sendMessage}
-            disabled={!inputMessage.trim() || isLoading}
-            sx={{ mb: 0.5 }}
-          >
-            <SendIcon />
-          </IconButton>
+
+          {/* Scroll anchor */}
+          <div ref={messagesEndRef} />
         </Box>
-      </Paper>
+
+        {/* Input Area */}
+        <Box
+          sx={{
+            borderTop: `1px solid ${designVars.border}`,
+            bgcolor: designVars.bg,
+            p: 3, // Consistent padding with chat area
+            flexShrink: 0, // Prevent shrinking
+          }}
+        >
+          <Box
+            sx={{
+              width: '100%',
+              display: 'flex',
+              alignItems: 'flex-end',
+              gap: 1,
+              bgcolor: designVars.inputBg,
+              border: `1px solid ${designVars.inputBorder}`,
+              borderRadius: 3,
+              px: 2,
+              py: 1,
+              '&:focus-within': {
+                borderColor: colors.primary.main,
+                boxShadow: `0 0 0 2px ${colors.primary.light}20`,
+              },
+            }}
+          >
+            <TextField
+              multiline
+              maxRows={4}
+              value={inputMessage}
+              onChange={(e) => setInputMessage(e.target.value)}
+              onKeyPress={handleKeyPress}
+              placeholder="Message MIRA..."
+              variant="standard"
+              sx={{
+                flex: 1,
+                '& .MuiInput-root': {
+                  fontSize: 16,
+                  color: colors.text.primary,
+                  '&::before': { borderBottom: 'none' },
+                  '&::after': { borderBottom: 'none' },
+                  '&:hover::before': { borderBottom: 'none' },
+                },
+                '& .MuiInput-input': {
+                  padding: '8px 0',
+                  '&::placeholder': {
+                    color: colors.text.hint,
+                    opacity: 1,
+                  },
+                },
+              }}
+            />
+            <IconButton
+              onClick={sendMessage}
+              disabled={!inputMessage.trim() || isLoading}
+              sx={{
+                color: inputMessage.trim() && !isLoading ? colors.primary.main : colors.text.hint,
+                p: 1,
+                '&:hover': {
+                  bgcolor: inputMessage.trim() && !isLoading ? colors.primary.light + '20' : 'transparent',
+                },
+                '&:disabled': {
+                  color: colors.text.hint,
+                },
+              }}
+            >
+              <Send />
+            </IconButton>
+          </Box>
+        </Box>
+      </Box>
     </Box>
   );
-}
+};
 
 export default ChatInterface;

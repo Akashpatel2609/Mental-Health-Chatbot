@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 import {
   Box,
+  Card,
+  CardContent,
   TextField,
   Button,
   Typography,
-  Paper,
-  Container,
-  Alert,
-  IconButton,
-  InputAdornment,
   Link,
+  Alert,
   CircularProgress,
+  InputAdornment,
+  IconButton,
   FormControl,
   InputLabel,
   Select,
@@ -22,13 +22,14 @@ import {
   Email,
   Lock,
   Person,
-  PersonAdd,
-  Cake
+  Cake,
+  Wc
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
+import { colors } from '../theme';
 
-const SignUp = ({ onSwitchToSignin }) => {
+const SignUp = ({ onSwitchToSignIn }) => {
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -41,378 +42,269 @@ const SignUp = ({ onSwitchToSignin }) => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [validationErrors, setValidationErrors] = useState({});
-  
-  const { signup, error, clearError } = useAuth();
-
-  const validateForm = () => {
-    const errors = {};
-    
-    if (!formData.username.trim()) {
-      errors.username = 'Username is required';
-    } else if (formData.username.length < 3) {
-      errors.username = 'Username must be at least 3 characters';
-    }
-    
-    if (!formData.email.trim()) {
-      errors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      errors.email = 'Please enter a valid email address';
-    }
-    
-    if (!formData.password) {
-      errors.password = 'Password is required';
-    } else if (formData.password.length < 6) {
-      errors.password = 'Password must be at least 6 characters';
-    }
-    
-    if (formData.password !== formData.confirmPassword) {
-      errors.confirmPassword = 'Passwords do not match';
-    }
-    
-    if (!formData.firstName.trim()) {
-      errors.firstName = 'First name is required';
-    }
-    
-    if (!formData.lastName.trim()) {
-      errors.lastName = 'Last name is required';
-    }
-    
-    if (!formData.age) {
-      errors.age = 'Age is required';
-    } else if (parseInt(formData.age) < 13 || parseInt(formData.age) > 120) {
-      errors.age = 'Please enter a valid age (13-120)';
-    }
-    
-    setValidationErrors(errors);
-    return Object.keys(errors).length === 0;
-  };
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const { signUp } = useAuth();
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-    
-    // Clear validation error for this field
-    if (validationErrors[name]) {
-      setValidationErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }));
-    }
-    
-    if (error) clearError();
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+    setError(''); // Clear error when user starts typing
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    if (!validateForm()) {
+    setLoading(true);
+    setError('');
+
+    // Validation
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match');
+      setLoading(false);
       return;
     }
-    
-    setIsLoading(true);
-    
-    const userData = {
-      username: formData.username,
-      email: formData.email,
-      password: formData.password,
-      firstName: formData.firstName,
-      lastName: formData.lastName,
-      age: parseInt(formData.age),
-      gender: formData.gender
-    };
-    
-    const result = await signup(userData);
-    
-    if (result.success) {
-      // Redirect to Flask app with user info
-      window.location.href = `http://localhost:5000?user=${result.user.username}`;
+
+    if (formData.password.length < 6) {
+      setError('Password must be at least 6 characters long');
+      setLoading(false);
+      return;
     }
-    
-    setIsLoading(false);
-  };
 
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
-
-  const toggleConfirmPasswordVisibility = () => {
-    setShowConfirmPassword(!showConfirmPassword);
+    try {
+      await signUp(formData);
+    } catch (err) {
+      setError(err.message || 'Sign up failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <Container component="main" maxWidth="sm">
+    <Box
+      sx={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: colors.gradients.landing,
+        padding: 2
+      }}
+    >
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
       >
-        <Box
+        <Card
           sx={{
-            marginTop: 4,
-            marginBottom: 4,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
+            width: { xs: '100%', sm: 450 },
+            borderRadius: 3,
+            boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
+            background: 'rgba(255, 255, 255, 0.95)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            maxHeight: '90vh',
+            overflow: 'auto'
           }}
         >
-          <Paper
-            elevation={8}
-            sx={{
-              padding: 4,
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              width: '100%',
-              borderRadius: 3,
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              color: 'white'
-            }}
-          >
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ delay: 0.2, type: "spring", stiffness: 260, damping: 20 }}
-            >
-              <PersonAdd sx={{ fontSize: 40, mb: 2 }} />
-            </motion.div>
-            
-            <Typography component="h1" variant="h4" sx={{ mb: 3, fontWeight: 'bold' }}>
-              Join Mental Health Buddy
-            </Typography>
-            
-            <Typography variant="body1" sx={{ mb: 3, textAlign: 'center', opacity: 0.9 }}>
-              Start your journey to better mental wellness today
-            </Typography>
+          <CardContent sx={{ p: 4 }}>
+            {/* Header */}
+            <Box sx={{ textAlign: 'center', mb: 4 }}>
+              <Typography
+                variant="h4"
+                sx={{
+                  fontWeight: 700,
+                  background: colors.gradients.primary,
+                  backgroundClip: 'text',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  mb: 1
+                }}
+              >
+                Join Our Community 💙
+              </Typography>
+              <Typography variant="body1" sx={{ color: colors.text.secondary, fontWeight: 400 }}>
+                Start your mental wellness journey today
+              </Typography>
+            </Box>
 
+            {/* Error Alert */}
             {error && (
-              <Alert severity="error" sx={{ width: '100%', mb: 2 }}>
-                {error}
-              </Alert>
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }}>
+                  {error}
+                </Alert>
+              </motion.div>
             )}
 
-            <Box component="form" onSubmit={handleSubmit} sx={{ width: '100%' }}>
-              <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+            {/* Sign Up Form */}
+            <Box component="form" onSubmit={handleSubmit} sx={{ mb: 3 }}>
+              <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
                 <TextField
-                  required
                   fullWidth
-                  id="firstName"
                   label="First Name"
                   name="firstName"
-                  autoComplete="given-name"
                   value={formData.firstName}
                   onChange={handleChange}
-                  error={!!validationErrors.firstName}
-                  helperText={validationErrors.firstName}
+                  required
                   sx={{
                     '& .MuiOutlinedInput-root': {
-                      '& fieldset': {
-                        borderColor: 'rgba(255, 255, 255, 0.3)',
-                      },
+                      borderRadius: 2,
+                      backgroundColor: colors.neutral.white,
                       '&:hover fieldset': {
-                        borderColor: 'rgba(255, 255, 255, 0.5)',
+                        borderColor: colors.primary.main,
                       },
                       '&.Mui-focused fieldset': {
-                        borderColor: 'white',
+                        borderColor: colors.primary.main,
                       },
                     },
-                    '& .MuiInputLabel-root': {
-                      color: 'rgba(255, 255, 255, 0.7)',
-                    },
-                    '& .MuiInputLabel-root.Mui-focused': {
-                      color: 'white',
-                    },
-                    '& .MuiInputBase-input': {
-                      color: 'white',
-                    },
+                  }}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Person sx={{ color: colors.primary.main }} />
+                      </InputAdornment>
+                    ),
                   }}
                 />
                 <TextField
-                  required
                   fullWidth
-                  id="lastName"
                   label="Last Name"
                   name="lastName"
-                  autoComplete="family-name"
                   value={formData.lastName}
                   onChange={handleChange}
-                  error={!!validationErrors.lastName}
-                  helperText={validationErrors.lastName}
+                  required
                   sx={{
                     '& .MuiOutlinedInput-root': {
-                      '& fieldset': {
-                        borderColor: 'rgba(255, 255, 255, 0.3)',
-                      },
+                      borderRadius: 2,
+                      backgroundColor: colors.neutral.white,
                       '&:hover fieldset': {
-                        borderColor: 'rgba(255, 255, 255, 0.5)',
+                        borderColor: colors.primary.main,
                       },
                       '&.Mui-focused fieldset': {
-                        borderColor: 'white',
+                        borderColor: colors.primary.main,
                       },
-                    },
-                    '& .MuiInputLabel-root': {
-                      color: 'rgba(255, 255, 255, 0.7)',
-                    },
-                    '& .MuiInputLabel-root.Mui-focused': {
-                      color: 'white',
-                    },
-                    '& .MuiInputBase-input': {
-                      color: 'white',
                     },
                   }}
                 />
               </Box>
 
               <TextField
-                margin="normal"
-                required
                 fullWidth
-                id="username"
                 label="Username"
                 name="username"
-                autoComplete="username"
                 value={formData.username}
                 onChange={handleChange}
-                error={!!validationErrors.username}
-                helperText={validationErrors.username}
+                required
                 sx={{
+                  mb: 3,
                   '& .MuiOutlinedInput-root': {
-                    '& fieldset': {
-                      borderColor: 'rgba(255, 255, 255, 0.3)',
-                    },
+                    borderRadius: 2,
+                    backgroundColor: colors.neutral.white,
                     '&:hover fieldset': {
-                      borderColor: 'rgba(255, 255, 255, 0.5)',
+                      borderColor: colors.primary.main,
                     },
                     '&.Mui-focused fieldset': {
-                      borderColor: 'white',
+                      borderColor: colors.primary.main,
                     },
-                  },
-                  '& .MuiInputLabel-root': {
-                    color: 'rgba(255, 255, 255, 0.7)',
-                  },
-                  '& .MuiInputLabel-root.Mui-focused': {
-                    color: 'white',
-                  },
-                  '& .MuiInputBase-input': {
-                    color: 'white',
                   },
                 }}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <Person sx={{ color: 'rgba(255, 255, 255, 0.7)' }} />
+                      <Person sx={{ color: colors.primary.main }} />
                     </InputAdornment>
                   ),
                 }}
               />
 
               <TextField
-                margin="normal"
-                required
                 fullWidth
-                id="email"
-                label="Email Address"
+                label="Email"
                 name="email"
-                autoComplete="email"
+                type="email"
                 value={formData.email}
                 onChange={handleChange}
-                error={!!validationErrors.email}
-                helperText={validationErrors.email}
+                required
                 sx={{
+                  mb: 3,
                   '& .MuiOutlinedInput-root': {
-                    '& fieldset': {
-                      borderColor: 'rgba(255, 255, 255, 0.3)',
-                    },
+                    borderRadius: 2,
+                    backgroundColor: colors.neutral.white,
                     '&:hover fieldset': {
-                      borderColor: 'rgba(255, 255, 255, 0.5)',
+                      borderColor: colors.primary.main,
                     },
                     '&.Mui-focused fieldset': {
-                      borderColor: 'white',
+                      borderColor: colors.primary.main,
                     },
-                  },
-                  '& .MuiInputLabel-root': {
-                    color: 'rgba(255, 255, 255, 0.7)',
-                  },
-                  '& .MuiInputLabel-root.Mui-focused': {
-                    color: 'white',
-                  },
-                  '& .MuiInputBase-input': {
-                    color: 'white',
                   },
                 }}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <Email sx={{ color: 'rgba(255, 255, 255, 0.7)' }} />
+                      <Email sx={{ color: colors.primary.main }} />
                     </InputAdornment>
                   ),
                 }}
               />
 
-              <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
+              <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
                 <TextField
-                  required
                   fullWidth
-                  id="age"
                   label="Age"
                   name="age"
                   type="number"
                   value={formData.age}
                   onChange={handleChange}
-                  error={!!validationErrors.age}
-                  helperText={validationErrors.age}
+                  required
                   sx={{
                     '& .MuiOutlinedInput-root': {
-                      '& fieldset': {
-                        borderColor: 'rgba(255, 255, 255, 0.3)',
-                      },
+                      borderRadius: 2,
+                      backgroundColor: colors.neutral.white,
                       '&:hover fieldset': {
-                        borderColor: 'rgba(255, 255, 255, 0.5)',
+                        borderColor: colors.primary.main,
                       },
                       '&.Mui-focused fieldset': {
-                        borderColor: 'white',
+                        borderColor: colors.primary.main,
                       },
-                    },
-                    '& .MuiInputLabel-root': {
-                      color: 'rgba(255, 255, 255, 0.7)',
-                    },
-                    '& .MuiInputLabel-root.Mui-focused': {
-                      color: 'white',
-                    },
-                    '& .MuiInputBase-input': {
-                      color: 'white',
                     },
                   }}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <Cake sx={{ color: 'rgba(255, 255, 255, 0.7)' }} />
+                        <Cake sx={{ color: colors.primary.main }} />
                       </InputAdornment>
                     ),
                   }}
                 />
                 <FormControl fullWidth>
-                  <InputLabel sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>Gender</InputLabel>
+                  <InputLabel>Gender</InputLabel>
                   <Select
                     name="gender"
                     value={formData.gender}
                     onChange={handleChange}
+                    label="Gender"
                     sx={{
-                      color: 'white',
-                      '& .MuiOutlinedInput-notchedOutline': {
-                        borderColor: 'rgba(255, 255, 255, 0.3)',
+                      borderRadius: 2,
+                      backgroundColor: colors.neutral.white,
+                      '&:hover fieldset': {
+                        borderColor: colors.primary.main,
                       },
-                      '&:hover .MuiOutlinedInput-notchedOutline': {
-                        borderColor: 'rgba(255, 255, 255, 0.5)',
-                      },
-                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                        borderColor: 'white',
+                      '&.Mui-focused fieldset': {
+                        borderColor: colors.primary.main,
                       },
                     }}
+                    startAdornment={
+                      <InputAdornment position="start">
+                        <Wc sx={{ color: colors.primary.main }} />
+                      </InputAdornment>
+                    }
                   >
                     <MenuItem value="male">Male</MenuItem>
                     <MenuItem value="female">Female</MenuItem>
@@ -421,55 +313,39 @@ const SignUp = ({ onSwitchToSignin }) => {
                   </Select>
                 </FormControl>
               </Box>
-              
+
               <TextField
-                margin="normal"
-                required
                 fullWidth
-                name="password"
                 label="Password"
+                name="password"
                 type={showPassword ? 'text' : 'password'}
-                id="password"
-                autoComplete="new-password"
                 value={formData.password}
                 onChange={handleChange}
-                error={!!validationErrors.password}
-                helperText={validationErrors.password}
+                required
                 sx={{
+                  mb: 3,
                   '& .MuiOutlinedInput-root': {
-                    '& fieldset': {
-                      borderColor: 'rgba(255, 255, 255, 0.3)',
-                    },
+                    borderRadius: 2,
+                    backgroundColor: colors.neutral.white,
                     '&:hover fieldset': {
-                      borderColor: 'rgba(255, 255, 255, 0.5)',
+                      borderColor: colors.primary.main,
                     },
                     '&.Mui-focused fieldset': {
-                      borderColor: 'white',
+                      borderColor: colors.primary.main,
                     },
-                  },
-                  '& .MuiInputLabel-root': {
-                    color: 'rgba(255, 255, 255, 0.7)',
-                  },
-                  '& .MuiInputLabel-root.Mui-focused': {
-                    color: 'white',
-                  },
-                  '& .MuiInputBase-input': {
-                    color: 'white',
                   },
                 }}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <Lock sx={{ color: 'rgba(255, 255, 255, 0.7)' }} />
+                      <Lock sx={{ color: colors.primary.main }} />
                     </InputAdornment>
                   ),
                   endAdornment: (
                     <InputAdornment position="end">
                       <IconButton
-                        aria-label="toggle password visibility"
-                        onClick={togglePasswordVisibility}
+                        onClick={() => setShowPassword(!showPassword)}
                         edge="end"
-                        sx={{ color: 'rgba(255, 255, 255, 0.7)' }}
                       >
                         {showPassword ? <VisibilityOff /> : <Visibility />}
                       </IconButton>
@@ -479,53 +355,37 @@ const SignUp = ({ onSwitchToSignin }) => {
               />
 
               <TextField
-                margin="normal"
-                required
                 fullWidth
-                name="confirmPassword"
                 label="Confirm Password"
+                name="confirmPassword"
                 type={showConfirmPassword ? 'text' : 'password'}
-                id="confirmPassword"
-                autoComplete="new-password"
                 value={formData.confirmPassword}
                 onChange={handleChange}
-                error={!!validationErrors.confirmPassword}
-                helperText={validationErrors.confirmPassword}
+                required
                 sx={{
+                  mb: 4,
                   '& .MuiOutlinedInput-root': {
-                    '& fieldset': {
-                      borderColor: 'rgba(255, 255, 255, 0.3)',
-                    },
+                    borderRadius: 2,
+                    backgroundColor: colors.neutral.white,
                     '&:hover fieldset': {
-                      borderColor: 'rgba(255, 255, 255, 0.5)',
+                      borderColor: colors.primary.main,
                     },
                     '&.Mui-focused fieldset': {
-                      borderColor: 'white',
+                      borderColor: colors.primary.main,
                     },
-                  },
-                  '& .MuiInputLabel-root': {
-                    color: 'rgba(255, 255, 255, 0.7)',
-                  },
-                  '& .MuiInputLabel-root.Mui-focused': {
-                    color: 'white',
-                  },
-                  '& .MuiInputBase-input': {
-                    color: 'white',
                   },
                 }}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <Lock sx={{ color: 'rgba(255, 255, 255, 0.7)' }} />
+                      <Lock sx={{ color: colors.primary.main }} />
                     </InputAdornment>
                   ),
                   endAdornment: (
                     <InputAdornment position="end">
                       <IconButton
-                        aria-label="toggle confirm password visibility"
-                        onClick={toggleConfirmPasswordVisibility}
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                         edge="end"
-                        sx={{ color: 'rgba(255, 255, 255, 0.7)' }}
                       >
                         {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
                       </IconButton>
@@ -533,60 +393,61 @@ const SignUp = ({ onSwitchToSignin }) => {
                   ),
                 }}
               />
-              
+
               <Button
                 type="submit"
-                fullWidth
                 variant="contained"
-                disabled={isLoading}
+                fullWidth
+                disabled={loading}
                 sx={{
-                  mt: 3,
-                  mb: 2,
+                  background: colors.gradients.primary,
                   py: 1.5,
                   fontSize: '1.1rem',
-                  fontWeight: 'bold',
-                  background: 'rgba(255, 255, 255, 0.2)',
-                  backdropFilter: 'blur(10px)',
-                  border: '1px solid rgba(255, 255, 255, 0.3)',
+                  fontWeight: 600,
+                  borderRadius: 2,
                   '&:hover': {
-                    background: 'rgba(255, 255, 255, 0.3)',
-                    transform: 'translateY(-2px)',
+                    background: colors.gradients.secondary
                   },
-                  transition: 'all 0.3s ease',
+                  '&:disabled': {
+                    background: colors.neutral.gray,
+                    color: colors.text.disabled
+                  }
                 }}
               >
-                {isLoading ? (
-                  <CircularProgress size={24} sx={{ color: 'white' }} />
+                {loading ? (
+                  <CircularProgress size={24} sx={{ color: colors.neutral.white }} />
                 ) : (
                   'Create Account'
                 )}
               </Button>
-              
-              <Box sx={{ textAlign: 'center' }}>
-                <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.8)' }}>
-                  Already have an account?{' '}
-                  <Link
-                    component="button"
-                    variant="body2"
-                    onClick={onSwitchToSignin}
-                    sx={{
-                      color: 'white',
-                      textDecoration: 'underline',
-                      cursor: 'pointer',
-                      '&:hover': {
-                        color: 'rgba(255, 255, 255, 0.8)',
-                      }
-                    }}
-                  >
-                    Sign in here
-                  </Link>
-                </Typography>
-              </Box>
             </Box>
-          </Paper>
-        </Box>
+
+            {/* Sign In Link */}
+            <Box sx={{ textAlign: 'center' }}>
+              <Typography variant="body2" sx={{ color: colors.text.secondary }}>
+                Already have an account?{' '}
+                <Link
+                  component="button"
+                  variant="body2"
+                  onClick={onSwitchToSignIn}
+                  sx={{
+                    color: colors.primary.main,
+                    textDecoration: 'none',
+                    fontWeight: 600,
+                    '&:hover': {
+                      color: colors.primary.dark,
+                      textDecoration: 'underline'
+                    }
+                  }}
+                >
+                  Sign In
+                </Link>
+              </Typography>
+            </Box>
+          </CardContent>
+        </Card>
       </motion.div>
-    </Container>
+    </Box>
   );
 };
 

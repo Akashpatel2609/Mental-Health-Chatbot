@@ -9,448 +9,730 @@ import {
   CardContent,
   CardMedia,
   useTheme,
-  useMediaQuery
+  useMediaQuery,
+  Stack,
+  Chip,
+  TextField,
+  Alert,
+  Snackbar,
+  Paper,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText
 } from '@mui/material';
 import {
   Psychology,
   Favorite,
+  EmojiEmotions,
   Security,
+  AccessTime,
   Support,
-  Accessibility,
-  TrendingUp,
-  ArrowForward
+  ArrowForward,
+  Check,
+  Email,
+  Phone,
+  LocationOn,
+  Send
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
 import Navigation from './Navigation';
 import { useNavigate } from 'react-router-dom';
+import Spline from '@splinetool/react-spline';
+import { colors } from '../theme';
 
-const LandingPage = ({ onShowSignIn, onShowSignUp }) => {
+const fancyFont = `'Inter', 'Poppins', 'Montserrat', 'Quicksand', 'cursive', 'sans-serif'`;
+
+const LandingPage = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const { currentUser, logout } = useAuth();
   const navigate = useNavigate();
+  const [contactForm, setContactForm] = useState({
+    name: '',
+    email: '',
+    subject: '',
+    message: ''
+  });
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: '',
+    severity: 'success'
+  });
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = () => logout();
+  const handleGoToDashboard = () => navigate('/dashboard/chat');
+  const handleShowSignIn = () => navigate('/signin');
+  const handleShowSignUp = () => navigate('/signup');
+
+  const handleContactSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch('http://localhost:5000/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(contactForm),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setSnackbar({ open: true, message: data.message, severity: 'success' });
+        setContactForm({ name: '', email: '', subject: '', message: '' });
+      } else {
+        setSnackbar({ open: true, message: data.error || 'Failed to send message', severity: 'error' });
+      }
+    } catch (error) {
+      setSnackbar({ open: true, message: 'Network error. Please try again.', severity: 'error' });
+    }
   };
+  const handleContactChange = (e) => setContactForm({ ...contactForm, [e.target.name]: e.target.value });
+  const handleCloseSnackbar = () => setSnackbar({ ...snackbar, open: false });
 
-  const handleContinueSession = () => {
-    window.location.href = `http://localhost:5000?user=${currentUser.username}`;
-  };
-
-  const handleEnhancedChat = () => {
-    navigate('/enhanced-chat');
-  };
-
-  const handleGoToDashboard = () => {
-    navigate('/dashboard/chat');
-  };
-
-  const features = [
+  const highlights = [
     {
-      icon: <Psychology sx={{ fontSize: 40, color: '#667eea' }} />,
-      title: 'AI-Powered Therapy',
-      description: 'Advanced AI that understands and responds with empathy, providing personalized mental health support.'
+      title: 'AI-Powered Conversations',
+      description: 'Engage in meaningful, empathetic conversations with our advanced AI that understands context and emotions.',
+      icon: <Psychology sx={{ fontSize: 50, color: colors.primary.main }} />,
+      image: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&h=600&fit=crop&q=80',
+      stats: '10,000+ conversations daily'
     },
     {
-      icon: <Favorite sx={{ fontSize: 40, color: '#e91e63' }} />,
-      title: 'Emotion Detection',
-      description: 'Real-time emotion analysis to provide the most appropriate and helpful responses.'
+      title: 'Mood Tracking & Analytics',
+      description: 'Track your emotional journey with detailed analytics and insights to understand your mental wellness patterns.',
+      icon: <EmojiEmotions sx={{ fontSize: 50, color: colors.secondary.main }} />,
+      image: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=800&h=600&fit=crop&q=80',
+      stats: '95% accuracy in mood detection'
     },
     {
-      icon: <Security sx={{ fontSize: 40, color: '#4caf50' }} />,
-      title: 'Privacy First',
-      description: 'Your conversations are private and secure. We prioritize your mental health and data protection.'
+      title: 'Crisis Intervention',
+      description: 'Immediate crisis support with emergency resources and professional escalation when needed.',
+      icon: <Support sx={{ fontSize: 50, color: colors.error.main }} />,
+      image: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=800&h=600&fit=crop&q=80',
+      stats: '24/7 crisis support available'
     },
     {
-      icon: <Support sx={{ fontSize: 40, color: '#ff9800' }} />,
-      title: '24/7 Support',
-      description: 'Available whenever you need someone to talk to, day or night.'
-    },
-    {
-      icon: <Accessibility sx={{ fontSize: 40, color: '#9c27b0' }} />,
-      title: 'Accessible Design',
-      description: 'Voice features and intuitive interface make mental health support accessible to everyone.'
-    },
-    {
-      icon: <TrendingUp sx={{ fontSize: 40, color: '#2196f3' }} />,
-      title: 'Progress Tracking',
-      description: 'Track your mental wellness journey with insights and personalized recommendations.'
+      title: 'Wellness Activities',
+      description: 'Interactive wellness tools including breathing exercises, meditation guides, and stress relief activities.',
+      icon: <Favorite sx={{ fontSize: 50, color: colors.success.main }} />,
+      image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop&q=80',
+      stats: '50+ wellness activities'
     }
   ];
 
-  const activities = [
+  const testimonials = [
     {
-      title: 'Breathing Exercises',
-      description: 'Guided breathing techniques to reduce anxiety and stress',
-      image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=250&fit=crop'
+      name: 'Sarah M.',
+      role: 'Student',
+      content: 'Mental Health Buddy has been a game-changer for my anxiety. The AI conversations feel so natural and supportive.',
+      rating: 5,
+      avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=800&h=600&fit=crop&crop=face&q=80'
     },
     {
-      title: 'Mood Tracking',
-      description: 'Monitor your emotional patterns and build self-awareness',
-      image: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=400&h=250&fit=crop'
+      name: 'Michael R.',
+      role: 'Professional',
+      content: 'I love the mood tracking feature. It helps me understand my emotional patterns and work on my mental wellness.',
+      rating: 5,
+      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=600&fit=crop&crop=face&q=80'
     },
     {
-      title: 'Therapeutic Games',
-      description: 'Engaging activities designed to improve mental wellness',
-      image: 'https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=400&h=250&fit=crop'
+      name: 'Emma L.',
+      role: 'Parent',
+      content: 'The crisis support features give me peace of mind. I know help is always available when I need it.',
+      rating: 5,
+      avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=800&h=600&fit=crop&crop=face&q=80'
     }
   ];
 
   return (
-    <Box sx={{ flexGrow: 1 }}>
-      {/* Navigation */}
+    <Box sx={{ flexGrow: 1, fontFamily: fancyFont, background: colors.gradients.landing, minHeight: '100vh' }}>
       <Navigation 
-        onShowSignIn={onShowSignIn}
-        onShowSignUp={onShowSignUp}
+        onShowSignIn={handleShowSignIn}
+        onShowSignUp={handleShowSignUp}
         currentUser={currentUser}
         onLogout={handleLogout}
       />
-
-      {/* Hero Section */}
-      <Box sx={{ pt: 8, pb: 6, background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: 'white' }}>
-        <Container maxWidth="lg">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-          >
-            <Box sx={{ textAlign: 'center', py: 8 }}>
-              <Typography variant="h2" component="h1" sx={{ fontWeight: 'bold', mb: 3 }}>
-                Your AI Mental Health Companion
-              </Typography>
-              <Typography variant="h5" sx={{ mb: 4, opacity: 0.9, maxWidth: 800, mx: 'auto' }}>
-                Experience compassionate, AI-powered mental health support available 24/7. 
-                Get personalized therapy, track your wellness journey, and find peace of mind.
-              </Typography>
-              
-              <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
-                {!currentUser ? (
-                  <>
-                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+      <Container maxWidth="xl" sx={{ pt: 6, pb: 6 }}>
+        <Grid container spacing={6} alignItems="center">
+          {/* Spline 3D Column */}
+          <Grid item xs={12} md={6}>
+            <Spline scene="https://prod.spline.design/vJ7ykh8JGvYyLEsB/scene.splinecode" style={{ width: '100%', height: isMobile ? 300 : 500 }} />
+          </Grid>
+          {/* Hero/CTA Column */}
+          <Grid item xs={12} md={6}>
+            <Box sx={{ textAlign: isMobile ? 'center' : 'left', color: colors.text.primary, px: isMobile ? 0 : 4 }}>
+              <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
+                <Typography variant="h2" sx={{ fontWeight: 900, mb: 2, fontFamily: fancyFont, color: colors.neutral.white, letterSpacing: 1 }}>
+                  Meet MIRA, Your AI Mental Health Buddy
+                </Typography>
+                <Typography variant="h5" sx={{ mb: 3, color: colors.neutral.white, fontWeight: 500, fontFamily: fancyFont, letterSpacing: 0.5 }}>
+                  Compassionate, interactive, and always here for you. Explore wellness, track your mood, and chat with MIRA 24/7.
+                </Typography>
+                {currentUser && (
+                  <Typography variant="h6" sx={{ mb: 3, color: colors.neutral.white, fontWeight: 700, fontFamily: fancyFont }}>
+                    Welcome back, {currentUser.first_name}! 💙
+                  </Typography>
+                )}
+                <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', justifyContent: isMobile ? 'center' : 'flex-start', mb: 4 }}>
+                  {!currentUser ? (
+                    <>
                       <Button
                         variant="contained"
                         size="large"
-                        onClick={onShowSignUp}
+                        onClick={handleShowSignUp}
                         sx={{
-                          background: 'rgba(255, 255, 255, 0.2)',
-                          backdropFilter: 'blur(10px)',
-                          border: '1px solid rgba(255, 255, 255, 0.3)',
+                          background: colors.gradients.primary,
+                          color: colors.neutral.white,
+                          fontWeight: 700,
+                          fontSize: '1.1rem',
+                          borderRadius: 3,
                           px: 4,
                           py: 1.5,
-                          fontSize: '1.1rem',
-                          '&:hover': {
-                            background: 'rgba(255, 255, 255, 0.3)',
-                          }
+                          boxShadow: 3,
+                          fontFamily: fancyFont,
+                          '&:hover': { background: colors.gradients.secondary }
                         }}
                       >
                         Start Your Journey
                         <ArrowForward sx={{ ml: 1 }} />
                       </Button>
-                    </motion.div>
-                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                       <Button
                         variant="outlined"
                         size="large"
-                        onClick={onShowSignIn}
+                        onClick={handleShowSignIn}
                         sx={{
-                          borderColor: 'white',
-                          color: 'white',
+                          borderColor: colors.neutral.white,
+                          color: colors.neutral.white,
+                          fontWeight: 600,
+                          fontSize: '1.1rem',
+                          borderRadius: 3,
                           px: 4,
                           py: 1.5,
-                          fontSize: '1.1rem',
-                          '&:hover': {
-                            borderColor: 'rgba(255, 255, 255, 0.8)',
-                            background: 'rgba(255, 255, 255, 0.1)',
+                          fontFamily: fancyFont,
+                          '&:hover': { 
+                            borderColor: colors.neutral.white,
+                            background: 'rgba(255,255,255,0.1)'
                           }
                         }}
                       >
                         Sign In
                       </Button>
-                    </motion.div>
-                  </>
-                ) : (
-                  <>
-                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                      <Button
-                        variant="contained"
-                        size="large"
-                        onClick={handleGoToDashboard}
-                        sx={{
-                          background: 'rgba(255, 255, 255, 0.2)',
-                          backdropFilter: 'blur(10px)',
-                          border: '1px solid rgba(255, 255, 255, 0.3)',
-                          px: 4,
-                          py: 1.5,
-                          fontSize: '1.1rem',
-                          '&:hover': {
-                            background: 'rgba(255, 255, 255, 0.3)',
-                          }
-                        }}
-                      >
-                        Go to Dashboard
-                        <ArrowForward sx={{ ml: 1 }} />
-                      </Button>
-                    </motion.div>
-                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                      <Button
-                        variant="outlined"
-                        size="large"
-                        onClick={handleContinueSession}
-                        sx={{
-                          borderColor: 'white',
-                          color: 'white',
-                          px: 4,
-                          py: 1.5,
-                          fontSize: '1.1rem',
-                          '&:hover': {
-                            borderColor: 'rgba(255, 255, 255, 0.8)',
-                            background: 'rgba(255, 255, 255, 0.1)',
-                          }
-                        }}
-                      >
-                        Continue Session
-                      </Button>
-                    </motion.div>
-                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                      <Button
-                        variant="outlined"
-                        size="large"
-                        onClick={handleEnhancedChat}
-                        sx={{
-                          borderColor: 'white',
-                          color: 'white',
-                          px: 4,
-                          py: 1.5,
-                          fontSize: '1.1rem',
-                          '&:hover': {
-                            borderColor: 'rgba(255, 255, 255, 0.8)',
-                            background: 'rgba(255, 255, 255, 0.1)',
-                          }
-                        }}
-                      >
-                        Enhanced Chat
-                        <ArrowForward sx={{ ml: 1 }} />
-                      </Button>
-                    </motion.div>
-                  </>
-                )}
-              </Box>
+                    </>
+                  ) : (
+                    <Button
+                      variant="contained"
+                      size="large"
+                      onClick={handleGoToDashboard}
+                      sx={{
+                        background: colors.gradients.primary,
+                        color: colors.neutral.white,
+                        fontWeight: 700,
+                        fontSize: '1.1rem',
+                        borderRadius: 3,
+                        px: 4,
+                        py: 1.5,
+                        boxShadow: 3,
+                        fontFamily: fancyFont,
+                        '&:hover': { background: colors.gradients.secondary }
+                      }}
+                    >
+                      Continue Session
+                      <ArrowForward sx={{ ml: 1 }} />
+                    </Button>
+                  )}
+                </Box>
+              </motion.div>
             </Box>
-          </motion.div>
-        </Container>
-      </Box>
+          </Grid>
+        </Grid>
 
-      {/* Features Section */}
-      <Container maxWidth="lg" sx={{ py: 8 }}>
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          viewport={{ once: true }}
-        >
-          <Typography variant="h3" component="h2" sx={{ textAlign: 'center', mb: 6, fontWeight: 'bold' }}>
-            Why Choose Mental Health Buddy?
-          </Typography>
+        {/* Highlights Section */}
+        <Box sx={{ mt: 12, mb: 8 }}>
+          <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2 }}>
+            <Typography variant="h3" sx={{ textAlign: 'center', mb: 6, fontWeight: 700, color: colors.neutral.white, fontFamily: fancyFont }}>
+              Why Choose MIRA?
+            </Typography>
+          </motion.div>
           
           <Grid container spacing={4}>
-            {features.map((feature, index) => (
-              <Grid item xs={12} sm={6} md={4} key={index}>
+            {highlights.map((highlight, index) => (
+              <Grid item xs={12} sm={6} md={3} key={index}>
                 <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: index * 0.1 }}
-                  viewport={{ once: true }}
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.3 + index * 0.1 }}
                 >
-                  <Card 
-                    sx={{ 
-                      height: '100%', 
-                      textAlign: 'center',
-                      transition: 'transform 0.3s ease',
-                      '&:hover': {
-                        transform: 'translateY(-8px)',
-                        boxShadow: 4
-                      }
-                    }}
-                  >
-                    <CardContent sx={{ p: 4 }}>
+                  <Card sx={{ 
+                    height: '100%', 
+                    background: 'rgba(255,255,255,0.95)', 
+                    backdropFilter: 'blur(10px)',
+                    borderRadius: 4,
+                    transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                    '&:hover': {
+                      transform: 'translateY(-8px)',
+                      boxShadow: '0 20px 40px rgba(0,0,0,0.15)'
+                    }
+                  }}>
+                    <CardContent sx={{ p: 4, textAlign: 'center' }}>
                       <Box sx={{ mb: 2 }}>
-                        {feature.icon}
+                        {highlight.icon}
                       </Box>
-                      <Typography variant="h6" component="h3" sx={{ mb: 2, fontWeight: 'bold' }}>
-                        {feature.title}
+                      <Typography variant="h6" sx={{ mb: 2, fontWeight: 600, color: colors.text.primary }}>
+                        {highlight.title}
                       </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        {feature.description}
+                      <Typography variant="body2" sx={{ mb: 3, color: colors.text.secondary, lineHeight: 1.6 }}>
+                        {highlight.description}
                       </Typography>
+                      <Chip 
+                        label={highlight.stats} 
+                        size="small" 
+                        sx={{ 
+                          background: colors.gradients.cool,
+                          color: colors.primary.main,
+                          fontWeight: 600
+                        }} 
+                      />
                     </CardContent>
                   </Card>
                 </motion.div>
               </Grid>
             ))}
           </Grid>
-        </motion.div>
-      </Container>
+        </Box>
 
-      {/* Activities Section */}
-      <Box sx={{ background: '#f8f9fa', py: 8 }}>
-        <Container maxWidth="lg">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-          >
-            <Typography variant="h3" component="h2" sx={{ textAlign: 'center', mb: 6, fontWeight: 'bold' }}>
-              Therapeutic Activities
+        {/* Testimonials Section */}
+        <Box sx={{ mt: 12, mb: 8 }}>
+          <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.4 }}>
+            <Typography variant="h3" sx={{ textAlign: 'center', mb: 6, fontWeight: 700, color: colors.neutral.white, fontFamily: fancyFont }}>
+              What Our Users Say
             </Typography>
-            
-            <Grid container spacing={4}>
-              {activities.map((activity, index) => (
-                <Grid item xs={12} md={4} key={index}>
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: index * 0.1 }}
-                    viewport={{ once: true }}
-                  >
-                    <Card sx={{ height: '100%' }}>
-                      <CardMedia
-                        component="img"
-                        height="200"
-                        image={activity.image}
-                        alt={activity.title}
-                      />
-                      <CardContent>
-                        <Typography variant="h6" component="h3" sx={{ mb: 2, fontWeight: 'bold' }}>
-                          {activity.title}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          {activity.description}
-                        </Typography>
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                </Grid>
-              ))}
-            </Grid>
           </motion.div>
-        </Container>
-      </Box>
+          
+          <Grid container spacing={4}>
+            {testimonials.map((testimonial, index) => (
+              <Grid item xs={12} md={4} key={index}>
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.5 + index * 0.1 }}
+                >
+                  <Card sx={{ 
+                    height: '100%', 
+                    background: 'rgba(255,255,255,0.95)', 
+                    backdropFilter: 'blur(10px)',
+                    borderRadius: 4,
+                    transition: 'transform 0.3s ease',
+                    '&:hover': {
+                      transform: 'translateY(-4px)'
+                    }
+                  }}>
+                    <CardContent sx={{ p: 4 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+                        <Box
+                          component="img"
+                          src={testimonial.avatar}
+                          alt={testimonial.name}
+                          sx={{ 
+                            width: 60, 
+                            height: 60, 
+                            borderRadius: '50%', 
+                            mr: 2,
+                            objectFit: 'cover'
+                          }}
+                        />
+                        <Box>
+                          <Typography variant="h6" sx={{ fontWeight: 600, color: colors.text.primary }}>
+                            {testimonial.name}
+                          </Typography>
+                          <Typography variant="body2" sx={{ color: colors.text.secondary }}>
+                            {testimonial.role}
+                          </Typography>
+                        </Box>
+                      </Box>
+                      <Typography variant="body1" sx={{ color: colors.text.secondary, lineHeight: 1.6, mb: 2 }}>
+                        "{testimonial.content}"
+                      </Typography>
+                      <Box sx={{ display: 'flex', gap: 0.5 }}>
+                        {[...Array(testimonial.rating)].map((_, i) => (
+                          <Box key={i} sx={{ color: colors.warning.main }}>★</Box>
+                        ))}
+                      </Box>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              </Grid>
+            ))}
+          </Grid>
+        </Box>
 
-      {/* CTA Section */}
-      <Box sx={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: 'white', py: 8 }}>
-        <Container maxWidth="md">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-          >
-            <Box sx={{ textAlign: 'center' }}>
-              <Typography variant="h3" component="h2" sx={{ mb: 3, fontWeight: 'bold' }}>
-                Ready to Start Your Wellness Journey?
-              </Typography>
-              <Typography variant="h6" sx={{ mb: 4, opacity: 0.9 }}>
-                Join thousands of users who have found support and improved their mental health with our AI companion.
-              </Typography>
-              
-              {!currentUser ? (
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+        {/* Pricing Section */}
+        <Box sx={{ mt: 12, mb: 8 }}>
+          <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.6 }}>
+            <Typography variant="h3" sx={{ textAlign: 'center', mb: 6, fontWeight: 700, color: colors.neutral.white, fontFamily: fancyFont }}>
+              Simple, Transparent Pricing
+            </Typography>
+          </motion.div>
+          
+          <Grid container spacing={4} justifyContent="center">
+            <Grid item xs={12} md={4}>
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.7 }}
+              >
+                <Card sx={{ 
+                  background: 'rgba(255,255,255,0.95)', 
+                  backdropFilter: 'blur(10px)',
+                  borderRadius: 4,
+                  p: 4,
+                  textAlign: 'center',
+                  position: 'relative',
+                  '&:hover': {
+                    transform: 'translateY(-8px)',
+                    boxShadow: '0 20px 40px rgba(0,0,0,0.15)'
+                  }
+                }}>
+                  <Typography variant="h4" sx={{ fontWeight: 700, color: colors.primary.main, mb: 2 }}>
+                    Free
+                  </Typography>
+                  <Typography variant="h2" sx={{ fontWeight: 900, color: colors.text.primary, mb: 1 }}>
+                    $0
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: colors.text.secondary, mb: 4 }}>
+                    Perfect for getting started
+                  </Typography>
+                  <List sx={{ mb: 4 }}>
+                    <ListItem sx={{ px: 0 }}>
+                      <ListItemIcon sx={{ minWidth: 32 }}>
+                        <Check sx={{ color: colors.success.main }} />
+                      </ListItemIcon>
+                      <ListItemText primary="Unlimited AI conversations" />
+                    </ListItem>
+                    <ListItem sx={{ px: 0 }}>
+                      <ListItemIcon sx={{ minWidth: 32 }}>
+                        <Check sx={{ color: colors.success.main }} />
+                      </ListItemIcon>
+                      <ListItemText primary="Basic mood tracking" />
+                    </ListItem>
+                    <ListItem sx={{ px: 0 }}>
+                      <ListItemIcon sx={{ minWidth: 32 }}>
+                        <Check sx={{ color: colors.success.main }} />
+                      </ListItemIcon>
+                      <ListItemText primary="Crisis support" />
+                    </ListItem>
+                  </List>
                   <Button
-                    variant="contained"
-                    size="large"
-                    onClick={onShowSignUp}
+                    variant="outlined"
+                    fullWidth
+                    onClick={handleShowSignUp}
                     sx={{
-                      background: 'rgba(255, 255, 255, 0.2)',
-                      backdropFilter: 'blur(10px)',
-                      border: '1px solid rgba(255, 255, 255, 0.3)',
-                      px: 6,
-                      py: 2,
-                      fontSize: '1.2rem',
+                      borderColor: colors.primary.main,
+                      color: colors.primary.main,
                       '&:hover': {
-                        background: 'rgba(255, 255, 255, 0.3)',
+                        borderColor: colors.primary.dark,
+                        background: colors.primary.main,
+                        color: colors.neutral.white
                       }
                     }}
                   >
                     Get Started Free
-                    <ArrowForward sx={{ ml: 1 }} />
                   </Button>
-                </motion.div>
-              ) : (
-                <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
-                  <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                    <Button
-                      variant="contained"
-                      size="large"
-                      onClick={handleGoToDashboard}
-                      sx={{
-                        background: 'rgba(255, 255, 255, 0.2)',
-                        backdropFilter: 'blur(10px)',
-                        border: '1px solid rgba(255, 255, 255, 0.3)',
-                        px: 6,
-                        py: 2,
-                        fontSize: '1.2rem',
-                        '&:hover': {
-                          background: 'rgba(255, 255, 255, 0.3)',
-                        }
-                      }}
-                    >
-                      Go to Dashboard
-                      <ArrowForward sx={{ ml: 1 }} />
-                    </Button>
-                  </motion.div>
-                  <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                    <Button
-                      variant="contained"
-                      size="large"
-                      onClick={handleContinueSession}
-                      sx={{
-                        background: 'rgba(255, 255, 255, 0.2)',
-                        backdropFilter: 'blur(10px)',
-                        border: '1px solid rgba(255, 255, 255, 0.3)',
-                        px: 6,
-                        py: 2,
-                        fontSize: '1.2rem',
-                        '&:hover': {
-                          background: 'rgba(255, 255, 255, 0.3)',
-                        }
-                      }}
-                    >
-                      Continue Session
-                      <ArrowForward sx={{ ml: 1 }} />
-                    </Button>
-                  </motion.div>
-                  <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                    <Button
-                      variant="outlined"
-                      size="large"
-                      onClick={handleEnhancedChat}
-                      sx={{
-                        borderColor: 'white',
-                        color: 'white',
-                        px: 6,
-                        py: 2,
-                        fontSize: '1.2rem',
-                        '&:hover': {
-                          borderColor: 'rgba(255, 255, 255, 0.8)',
-                          background: 'rgba(255, 255, 255, 0.1)',
-                        }
-                      }}
-                    >
-                      Enhanced Chat
-                      <ArrowForward sx={{ ml: 1 }} />
-                    </Button>
-                  </motion.div>
-                </Box>
-              )}
-            </Box>
+                </Card>
+              </motion.div>
+            </Grid>
+            
+            <Grid item xs={12} md={4}>
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.8 }}
+              >
+                <Card sx={{ 
+                  background: 'rgba(255,255,255,0.95)', 
+                  backdropFilter: 'blur(10px)',
+                  borderRadius: 4,
+                  p: 4,
+                  textAlign: 'center',
+                  position: 'relative',
+                  border: `2px solid ${colors.primary.main}`,
+                  '&:hover': {
+                    transform: 'translateY(-8px)',
+                    boxShadow: '0 20px 40px rgba(0,0,0,0.15)'
+                  }
+                }}>
+                  <Chip 
+                    label="Most Popular" 
+                    sx={{ 
+                      position: 'absolute', 
+                      top: -12, 
+                      left: '50%', 
+                      transform: 'translateX(-50%)',
+                      background: colors.primary.main,
+                      color: colors.neutral.white,
+                      fontWeight: 600
+                    }} 
+                  />
+                  <Typography variant="h4" sx={{ fontWeight: 700, color: colors.primary.main, mb: 2 }}>
+                    Premium
+                  </Typography>
+                  <Typography variant="h2" sx={{ fontWeight: 900, color: colors.text.primary, mb: 1 }}>
+                    $9.99
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: colors.text.secondary, mb: 4 }}>
+                    per month
+                  </Typography>
+                  <List sx={{ mb: 4 }}>
+                    <ListItem sx={{ px: 0 }}>
+                      <ListItemIcon sx={{ minWidth: 32 }}>
+                        <Check sx={{ color: colors.success.main }} />
+                      </ListItemIcon>
+                      <ListItemText primary="Everything in Free" />
+                    </ListItem>
+                    <ListItem sx={{ px: 0 }}>
+                      <ListItemIcon sx={{ minWidth: 32 }}>
+                        <Check sx={{ color: colors.success.main }} />
+                      </ListItemIcon>
+                      <ListItemText primary="Advanced analytics" />
+                    </ListItem>
+                    <ListItem sx={{ px: 0 }}>
+                      <ListItemIcon sx={{ minWidth: 32 }}>
+                        <Check sx={{ color: colors.success.main }} />
+                      </ListItemIcon>
+                      <ListItemText primary="Priority support" />
+                    </ListItem>
+                    <ListItem sx={{ px: 0 }}>
+                      <ListItemIcon sx={{ minWidth: 32 }}>
+                        <Check sx={{ color: colors.success.main }} />
+                      </ListItemIcon>
+                      <ListItemText primary="Custom wellness plans" />
+                    </ListItem>
+                  </List>
+                  <Button
+                    variant="contained"
+                    fullWidth
+                    onClick={handleShowSignUp}
+                    sx={{
+                      background: colors.gradients.primary,
+                      '&:hover': {
+                        background: colors.gradients.secondary
+                      }
+                    }}
+                  >
+                    Start Premium Trial
+                  </Button>
+                </Card>
+              </motion.div>
+            </Grid>
+          </Grid>
+        </Box>
+
+        {/* Contact Section */}
+        <Box sx={{ mt: 12, mb: 8 }}>
+          <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.9 }}>
+            <Typography variant="h3" sx={{ textAlign: 'center', mb: 6, fontWeight: 700, color: colors.neutral.white, fontFamily: fancyFont }}>
+              Get in Touch
+            </Typography>
           </motion.div>
-        </Container>
-      </Box>
+          
+          <Grid container spacing={6}>
+            <Grid item xs={12} md={6}>
+              <motion.div
+                initial={{ opacity: 0, x: -30 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6, delay: 1.0 }}
+              >
+                <Card sx={{ 
+                  background: 'rgba(255,255,255,0.95)', 
+                  backdropFilter: 'blur(10px)',
+                  borderRadius: 4,
+                  p: 4,
+                  height: '100%'
+                }}>
+                  <Typography variant="h5" sx={{ fontWeight: 600, color: colors.text.primary, mb: 3 }}>
+                    Contact Information
+                  </Typography>
+                  <List>
+                    <ListItem sx={{ px: 0 }}>
+                      <ListItemIcon>
+                        <Email sx={{ color: colors.primary.main }} />
+                      </ListItemIcon>
+                      <ListItemText 
+                        primary="Email" 
+                        secondary="support@mentalhealthbuddy.ai"
+                        secondaryTypographyProps={{ color: colors.text.secondary }}
+                      />
+                    </ListItem>
+                    <ListItem sx={{ px: 0 }}>
+                      <ListItemIcon>
+                        <Phone sx={{ color: colors.primary.main }} />
+                      </ListItemIcon>
+                      <ListItemText 
+                        primary="Phone" 
+                        secondary="+1 (555) 123-4567"
+                        secondaryTypographyProps={{ color: colors.text.secondary }}
+                      />
+                    </ListItem>
+                    <ListItem sx={{ px: 0 }}>
+                      <ListItemIcon>
+                        <LocationOn sx={{ color: colors.primary.main }} />
+                      </ListItemIcon>
+                      <ListItemText 
+                        primary="Address" 
+                        secondary="123 Wellness Street, Mental Health City, MH 12345"
+                        secondaryTypographyProps={{ color: colors.text.secondary }}
+                      />
+                    </ListItem>
+                  </List>
+                </Card>
+              </motion.div>
+            </Grid>
+            
+            <Grid item xs={12} md={6}>
+              <motion.div
+                initial={{ opacity: 0, x: 30 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6, delay: 1.1 }}
+              >
+                <Card sx={{ 
+                  background: 'rgba(255,255,255,0.95)', 
+                  backdropFilter: 'blur(10px)',
+                  borderRadius: 4,
+                  p: 4
+                }}>
+                  <Typography variant="h5" sx={{ fontWeight: 600, color: colors.text.primary, mb: 3 }}>
+                    Send us a Message
+                  </Typography>
+                  <Box component="form" onSubmit={handleContactSubmit}>
+                    <Grid container spacing={2}>
+                      <Grid item xs={12} sm={6}>
+                        <TextField
+                          fullWidth
+                          label="Name"
+                          name="name"
+                          value={contactForm.name}
+                          onChange={handleContactChange}
+                          required
+                          sx={{
+                            '& .MuiOutlinedInput-root': {
+                              borderRadius: 2,
+                              backgroundColor: colors.neutral.white,
+                              '&:hover fieldset': {
+                                borderColor: colors.primary.main,
+                              },
+                              '&.Mui-focused fieldset': {
+                                borderColor: colors.primary.main,
+                              },
+                            },
+                          }}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={6}>
+                        <TextField
+                          fullWidth
+                          label="Email"
+                          name="email"
+                          type="email"
+                          value={contactForm.email}
+                          onChange={handleContactChange}
+                          required
+                          sx={{
+                            '& .MuiOutlinedInput-root': {
+                              borderRadius: 2,
+                              backgroundColor: colors.neutral.white,
+                              '&:hover fieldset': {
+                                borderColor: colors.primary.main,
+                              },
+                              '&.Mui-focused fieldset': {
+                                borderColor: colors.primary.main,
+                              },
+                            },
+                          }}
+                        />
+                      </Grid>
+                      <Grid item xs={12}>
+                        <TextField
+                          fullWidth
+                          label="Subject"
+                          name="subject"
+                          value={contactForm.subject}
+                          onChange={handleContactChange}
+                          required
+                          sx={{
+                            '& .MuiOutlinedInput-root': {
+                              borderRadius: 2,
+                              backgroundColor: colors.neutral.white,
+                              '&:hover fieldset': {
+                                borderColor: colors.primary.main,
+                              },
+                              '&.Mui-focused fieldset': {
+                                borderColor: colors.primary.main,
+                              },
+                            },
+                          }}
+                        />
+                      </Grid>
+                      <Grid item xs={12}>
+                        <TextField
+                          fullWidth
+                          label="Message"
+                          name="message"
+                          value={contactForm.message}
+                          onChange={handleContactChange}
+                          required
+                          multiline
+                          rows={4}
+                          sx={{
+                            '& .MuiOutlinedInput-root': {
+                              borderRadius: 2,
+                              backgroundColor: colors.neutral.white,
+                              '&:hover fieldset': {
+                                borderColor: colors.primary.main,
+                              },
+                              '&.Mui-focused fieldset': {
+                                borderColor: colors.primary.main,
+                              },
+                            },
+                          }}
+                        />
+                      </Grid>
+                      <Grid item xs={12}>
+                        <Button
+                          type="submit"
+                          variant="contained"
+                          fullWidth
+                          endIcon={<Send />}
+                          sx={{
+                            background: colors.gradients.primary,
+                            py: 1.5,
+                            '&:hover': {
+                              background: colors.gradients.secondary
+                            }
+                          }}
+                        >
+                          Send Message
+                        </Button>
+                      </Grid>
+                    </Grid>
+                  </Box>
+                </Card>
+              </motion.div>
+            </Grid>
+          </Grid>
+        </Box>
+      </Container>
+
+      {/* Snackbar for contact form */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };
 
-export default LandingPage;
+export default LandingPage; 
