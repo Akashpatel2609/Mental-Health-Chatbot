@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mental Health Buddy - Mira with Enhanced Voice</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            font-weight: 600;
+        }
+
+        header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 15px;
+        }
+
+        .status-indicators {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            background: rgba(255,255,255,0.1);
+            padding: 8px 16px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #28a745;
+        }
+
+        .chat-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            min-height: 500px;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+            min-height: 400px;
+        }
+
+        .message {
+            display: flex;
+            margin-bottom: 25px;
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from { 
+                opacity: 0; 
+                transform: translateY(20px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
+        }
+
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .user-message {
+            flex-direction: row-reverse;
+        }
+
+        .user-message .message-avatar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            margin-right: 0;
+            margin-left: 15px;
+        }
+
+        .bot-message .message-avatar {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+        }
+
+        .message-content {
+            max-width: 70%;
+            padding: 15px 20px;
+            border-radius: 18px;
+            word-wrap: break-word;
+            position: relative;
+        }
+
+        .user-message .message-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-bottom-right-radius: 6px;
+        }
+
+        .bot-message .message-content {
+            background: #f8f9fa;
+            color: #333;
+            border: 1px solid #e9ecef;
+            border-bottom-left-radius: 6px;
+        }
+
+        .message-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            opacity: 0.8;
+        }
+
+        .voice-button {
+            background: #007bff;
+            border: none;
+            cursor: pointer;
+            font-size: 0.85rem;
+            padding: 6px 12px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 500;
+        }
+
+        .voice-button:hover {
+            background: #0056b3;
+            transform: scale(1.05);
+        }
+
+        .voice-button.playing {
+            background: #28a745;
+            animation: pulse 2s infinite;
+        }
+
+        .voice-button.stopping {
+            background: #ffc107;
+            color: #000;
+        }
+
+        .voice-button.error {
+            background: #dc3545;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+        }
+
+        .message-time {
+            font-size: 0.75rem;
+            color: #666;
+            margin-top: 8px;
+            opacity: 0.7;
+        }
+
+        .input-container {
+            padding: 25px 30px;
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            min-height: 100px;
+            flex-wrap: wrap;
+        }
+
+        #message-input {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid #e9ecef;
+            border-radius: 25px;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+            background: white;
+            min-height: 50px;
+            min-width: 200px;
+        }
+
+        #message-input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .control-button {
+            width: 50px;
+            height: 50px;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            font-size: 1.2rem;
+            color: white;
+        }
+
+        .control-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .control-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        #send-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        #voice-button {
+            background: #dc3545;
+        }
+
+        #voice-button.listening {
+            background: #28a745;
+            animation: pulse 1s infinite;
+        }
+
+        #activities-button {
+            background: #fd7e14;
+        }
+
+        .voice-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .voice-mode-toggle {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .voice-mode-toggle.active {
+            background: #28a745;
+        }
+
+        .voice-selector {
+            background: #495057;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+
+        .voice-selector:hover {
+            background: #343a40;
+        }
+
+        .voice-info {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 5px;
+            text-align: center;
+        }
+
+        .typing-indicator {
+            display: none;
+            margin-bottom: 25px;
+        }
+
+        .typing-indicator .message-content {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            padding: 15px 20px;
+        }
+
+        .dots {
+            display: flex;
+            gap: 4px;
+        }
+
+        .dots span {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #666;
+            animation: typing 1.4s infinite;
+        }
+
+        .dots span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .dots span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+                opacity: 0.4;
+            }
+            30% {
+                transform: translateY(-8px);
+                opacity: 1;
+            }
+        }
+
+        .crisis-resources {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+            border: 2px solid #ffeaa7;
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 20px;
+            text-align: center;
+            animation: slideIn 0.5s ease-out;
+            display: none;
+        }
+
+        @keyframes slideIn {
+            from { 
+                opacity: 0; 
+                transform: translateY(20px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
+        }
+
+        .crisis-resources h3 {
+            color: #856404;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .crisis-resources p {
+            margin-bottom: 10px;
+            color: #856404;
+            font-weight: 500;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+        }
+
+        .welcome-message {
+            background: #e8f4fd;
+            border: 1px solid #bee5eb;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .welcome-message h3 {
+            color: #0c5460;
+            margin-bottom: 10px;
+        }
+
+        .welcome-message p {
+            color: #0c5460;
+            margin-bottom: 10px;
+        }
+
+        .welcome-message ul {
+            color: #0c5460;
+        }
+
+        .voice-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            display: none;
+            z-index: 1000;
+        }
+
+        .global-stop-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5rem;
+            display: none;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+        }
+
+        .global-stop-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .status-indicators {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .chat-container {
+                min-height: 400px;
+            }
+            
+            .chat-messages {
+                padding: 20px;
+                min-height: 300px;
+            }
+            
+            .message-content {
+                max-width: 85%;
+            }
+            
+            .input-container {
+                padding: 20px;
+            }
+            
+            .voice-controls {
+                width: 100%;
+                justify-content: center;
+                margin-bottom: 15px;
+            }
+            
+            #message-input {
+                padding: 12px 16px;
+                min-width: 150px;
+            }
+            
+            .control-button {
+                width: 45px;
+                height: 45px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>💙 Mira - Enhanced Voice Mental Health Companion</h1>
+            <p>Hello Akashpatel2609! I'm here with a more natural, human-like voice.</p>
+            <div class="status-indicators">
+                <div class="status-indicator" id="api-status">
+                    <span class="status-dot"></span>
+                    <span class="status-text">Gemini 2.0 Flash Ready</span>
+                </div>
+                <div class="status-indicator" id="voice-status">
+                    <span class="status-dot"></span>
+                    <span class="status-text">Voice Initializing...</span>
+                </div>
+            </div>
+        </header>
+        
+        <div class="chat-container">
+            <div id="chat-messages" class="chat-messages">
+                <div class="welcome-message">
+                    <h3>🤖 Welcome to your Enhanced Voice Mental Health Companion!</h3>
+                    <p>Hello Akashpatel2609! I'm Mira with a new, more natural and human-like voice.</p>
+                    <p><strong>Current Time:</strong> 2025-06-25 15:28:36 UTC</p>
+                    <p><strong>New Features:</strong></p>
+                    <ul style="text-align: left; margin: 10px 0;">
+                        <li>🗣️ More natural, human-like voice with emotional expression</li>
+                        <li>⏯️ Click play buttons to start/stop audio anytime</li>
+                        <li>🎭 Multiple voice options to choose from</li>
+                        <li>🎤 Enhanced speech recognition for voice input</li>
+                        <li>🎯 Empathetic conversation designed for mental health support</li>
+                    </ul>
+                    <p>How are you feeling today, Akashpatel2609? Try my new voice!</p>
+                </div>
+            </div>
+            
+            <div class="typing-indicator" id="typing-indicator" style="display: none;">
+                <div class="message-avatar">🤖</div>
+                <div class="message-content">
+                    <div class="dots">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="input-container">
+                <input type="text" id="message-input" placeholder="Type your message here or use voice input..." maxlength="500" autofocus>
+                
+                <div class="voice-controls">
+                    <button class="voice-mode-toggle" id="voice-mode-toggle" title="Toggle Auto-Voice Response">
+                        🔊 Auto-Voice OFF
+                    </button>
+                    
+                    <select class="voice-selector" id="voice-selector" title="Select Voice">
+                        <option value="bella">Bella (Gentle)</option>
+                        <option value="rachel">Rachel (Calm)</option>
+                        <option value="domi">Domi (Warm)</option>
+                        <option value="elli">Elli (Soft)</option>
+                        <option value="josh">Josh (Male, Calm)</option>
+                        <option value="adam">Adam (Male, Deep)</option>
+                    </select>
+                    
+                    <div class="voice-info" id="voice-info">
+                        Bella - Gentle and caring
+                    </div>
+                </div>
+                
+                <button class="control-button" id="send-button" title="Send Message">
+                    ➤
+                </button>
+                <button class="control-button" id="voice-button" title="Voice Input">
+                    🎤
+                </button>
+                <button class="control-button" id="activities-button" title="Therapeutic Activities">
+                    🎮
+                </button>
+            </div>
+        </div>
+        
+        <div class="crisis-resources" id="crisis-resources">
+            <h3>🚨 Crisis Resources</h3>
+            <p><strong>Emergency:</strong> 911</p>
+            <p><strong>Suicide Prevention:</strong> 988</p>
+            <p><strong>Crisis Text:</strong> Text HOME to 741741</p>
+        </div>
+        
+        <div class="footer">
+            <p>Powered by Gemini 2.0 Flash AI & Enhanced ElevenLabs Voice • Current Time: 2025-06-25 15:28:36 UTC • Not a replacement for professional mental health care</p>
+        </div>
+    </div>
+    
+    <div class="voice-status" id="voice-status-popup">
+        🎤 Listening...
+    </div>
+    
+    <button class="global-stop-button" id="global-stop-button" title="Stop All Audio">
+        ⏹️
+    </button>
+    
+    <script>
+        class EnhancedVoiceMentalHealthBuddy {
+            constructor() {
+                this.chatMessages = document.getElementById('chat-messages');
+                this.messageInput = document.getElementById('message-input');
+                this.sendButton = document.getElementById('send-button');
+                this.voiceButton = document.getElementById('voice-button');
+                this.activitiesButton = document.getElementById('activities-button');
+                this.voiceModeToggle = document.getElementById('voice-mode-toggle');
+                this.voiceSelector = document.getElementById('voice-selector');
+                this.voiceInfo = document.getElementById('voice-info');
+                this.crisisResources = document.getElementById('crisis-resources');
+                this.typingIndicator = document.getElementById('typing-indicator');
+                this.apiStatus = document.getElementById('api-status');
+                this.voiceStatus = document.getElementById('voice-status');
+                this.voiceStatusPopup = document.getElementById('voice-status-popup');
+                this.globalStopButton = document.getElementById('global-stop-button');
+                
+                this.username = 'Akashpatel2609';
+                this.voiceMode = false;
+                this.isListening = false;
+                this.currentAudio = null;
+                this.currentVoiceButton = null;
+                this.currentVoice = 'bella';
+                this.audioContext = null;
+                
+                this.voiceDescriptions = {
+                    'bella': 'Bella - Gentle and caring',
+                    'rachel': 'Rachel - Calm and empathetic',
+                    'domi': 'Domi - Warm and supportive',
+                    'elli': 'Elli - Soft and kind',
+                    'josh': 'Josh - Calm male voice',
+                    'adam': 'Adam - Deep male voice'
+                };
+                
+                console.log('🚀 Enhanced Voice Mental Health Buddy initialized for Akashpatel2609');
+                console.log('📅 Current Time: 2025-06-25 15:28:36 UTC');
+                
+                this.init();
+            }
+            
+            init() {
+                this.setupChatInterface();
+                this.setupVoiceControls();
+                this.initializeAudioContext();
+                this.testApiConnection();
+                this.testVoiceService();
+                
+                this.messageInput.focus();
+                console.log('✅ Enhanced voice chat interface ready for Akashpatel2609');
+            }
+            
+            initializeAudioContext() {
+                try {
+                    window.AudioContext = window.AudioContext || window.webkitAudioContext;
+                    this.audioContext = new AudioContext();
+                    console.log('✅ AudioContext initialized');
+                } catch (error) {
+                    console.log('⚠️ AudioContext not supported:', error);
+                }
+            }
+            
+            setupChatInterface() {
+                this.sendButton.addEventListener('click', () => this.sendMessage());
+                
+                this.messageInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        this.sendMessage();
+                    }
+                });
+                
+                this.activitiesButton.addEventListener('click', () => this.showActivities());
+                console.log('✅ Chat event listeners attached');
+            }
+            
+            setupVoiceControls() {
+                this.voiceButton.addEventListener('click', () => this.toggleVoiceInput());
+                this.voiceModeToggle.addEventListener('click', () => this.toggleVoiceMode());
+                this.globalStopButton.addEventListener('click', () => this.stopAllAudio());
+                
+                // Voice selector
+                this.voiceSelector.addEventListener('change', (e) => {
+                    this.currentVoice = e.target.value;
+                    this.voiceInfo.textContent = this.voiceDescriptions[this.currentVoice];
+                    console.log(`🎭 Voice changed to ${this.currentVoice} for Akashpatel2609`);
+                });
+                
+                // Set initial voice info
+                this.voiceInfo.textContent = this.voiceDescriptions[this.currentVoice];
+                
+                console.log('✅ Voice event listeners attached');
+            }
+            
+            async testApiConnection() {
+                try {
+                    console.log('🧪 Testing API connection...');
+                    
+                    const statusDot = this.apiStatus.querySelector('.status-dot');
+                    const statusText = this.apiStatus.querySelector('.status-text');
+                    
+                    const response = await fetch('/test-api');
+                    const data = await response.json();
+                    
+                    console.log('📡 API Response:', data);
+                    
+                    if (data.api_working) {
+                        statusDot.style.background = '#28a745';
+                        statusText.textContent = data.mode + ' Ready';
+                        console.log('✅ API Connected:', data.mode);
+                    } else {
+                        statusDot.style.background = '#dc3545';
+                        statusText.textContent = 'API Connection Error';
+                        console.log('❌ API Failed');
+                    }
+                } catch (error) {
+                    console.error('❌ API Test Error:', error);
+                }
+            }
+            
+            async testVoiceService() {
+                try {
+                    console.log('🎤 Testing enhanced voice service...');
+                    
+                    const statusDot = this.voiceStatus.querySelector('.status-dot');
+                    const statusText = this.voiceStatus.querySelector('.status-text');
+                    
+                    const response = await fetch('/voice/test');
+                    const data = await response.json();
+                    
+                    console.log('🔊 Voice Response:', data);
+                    
+                    if (data.voice_working) {
+                        statusDot.style.background = '#28a745';
+                        statusText.textContent = 'Enhanced Voice Ready';
+                        console.log('✅ Enhanced Voice Service Connected');
+                    } else {
+                        statusDot.style.background = '#dc3545';
+                        statusText.textContent = 'Voice Service Error';
+                        console.log('❌ Voice Service Failed');
+                    }
+                } catch (error) {
+                    console.error('❌ Voice Test Error:', error);
+                    const statusDot = this.voiceStatus.querySelector('.status-dot');
+                    const statusText = this.voiceStatus.querySelector('.status-text');
+                    statusDot.style.background = '#dc3545';
+                    statusText.textContent = 'Voice Unavailable';
+                }
+            }
+            
+            toggleVoiceMode() {
+                this.voiceMode = !this.voiceMode;
+                
+                if (this.voiceMode) {
+                    this.voiceModeToggle.textContent = '🔊 Auto-Voice ON';
+                    this.voiceModeToggle.classList.add('active');
+                    console.log('✅ Auto-voice mode enabled for Akashpatel2609');
+                } else {
+                    this.voiceModeToggle.textContent = '🔊 Auto-Voice OFF';
+                    this.voiceModeToggle.classList.remove('active');
+                    console.log('⏸️ Auto-voice mode disabled');
+                }
+            }
+            
+            async toggleVoiceInput() {
+                if (this.isListening) {
+                    this.stopListening();
+                } else {
+                    await this.startListening();
+                }
+            }
+            
+            async startListening() {
+                try {
+                    console.log('🎤 Starting voice input for Akashpatel2609...');
+                    
+                    this.isListening = true;
+                    this.voiceButton.classList.add('listening');
+                    this.voiceButton.textContent = '⏹️';
+                    this.voiceStatusPopup.style.display = 'block';
+                    
+                    const response = await fetch('/voice/microphone-listen', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            username: this.username,
+                            timeout: 10
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success && data.text) {
+                        console.log('✅ Voice input received from Akashpatel2609:', data.text);
+                        this.messageInput.value = data.text;
+                        
+                        setTimeout(() => {
+                            this.sendMessage();
+                        }, 500);
+                    } else {
+                        console.log('❌ Voice input failed:', data.error);
+                        this.addMessage("I couldn't hear you clearly, Akashpatel2609. Please try again or type your message.", 'bot');
+                    }
+                    
+                } catch (error) {
+                    console.error('❌ Voice input error:', error);
+                    this.addMessage("I'm having trouble with voice input right now, Akashpatel2609. Please type your message.", 'bot');
+                } finally {
+                    this.stopListening();
+                }
+            }
+            
+            stopListening() {
+                this.isListening = false;
+                this.voiceButton.classList.remove('listening');
+                this.voiceButton.textContent = '🎤';
+                this.voiceStatusPopup.style.display = 'none';
+                console.log('⏹️ Voice input stopped');
+            }
+            
+            stopAllAudio() {
+                if (this.currentAudio) {
+                    console.log('⏹️ Stopping all audio for Akashpatel2609');
+                    this.currentAudio.pause();
+                    this.currentAudio.currentTime = 0;
+                    this.currentAudio = null;
+                    
+                    // Reset all voice buttons
+                    document.querySelectorAll('.voice-button').forEach(btn => {
+                        btn.classList.remove('playing', 'stopping');
+                        btn.innerHTML = '🔊 Play';
+                    });
+                    
+                    this.globalStopButton.style.display = 'none';
+                    this.currentVoiceButton = null;
+                }
+            }
+            
+            async playVoiceResponse(text, voiceButton = null) {
+                try {
+                    console.log('🔊 Generating enhanced voice response for Akashpatel2609...');
+                    console.log('📅 Current Time: 2025-06-25 15:28:36');
+                    
+                    // If audio is already playing from this button, stop it
+                    if (this.currentAudio && this.currentVoiceButton === voiceButton) {
+                        this.stopAllAudio();
+                        return;
+                    }
+                    
+                    // Stop any other playing audio
+                    this.stopAllAudio();
+                    
+                    if (voiceButton) {
+                        this.currentVoiceButton = voiceButton;
+                        voiceButton.classList.add('playing');
+                        voiceButton.innerHTML = '⏳ Loading...';
+                    }
+                    
+                    const response = await fetch('/voice/generate', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            text: text,
+                            username: this.username,
+                            voice_id: this.currentVoice,
+                            voice_style: 'empathetic'
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success && data.audio_base64) {
+                        console.log('✅ Enhanced audio received, preparing playback...');
+                        
+                        // Convert base64 to audio blob
+                        const audioBlob = this.base64ToBlob(data.audio_base64, 'audio/mpeg');
+                        const audioUrl = URL.createObjectURL(audioBlob);
+                        
+                        // Create and configure audio element
+                        this.currentAudio = new Audio(audioUrl);
+                        this.currentAudio.preload = 'auto';
+                        
+                        // Set up event listeners
+                        this.currentAudio.addEventListener('play', () => {
+                            console.log('▶️ Enhanced audio playback started for Akashpatel2609');
+                            if (voiceButton) {
+                                voiceButton.innerHTML = '⏸️ Stop';
+                                voiceButton.classList.add('playing');
+                            }
+                            this.globalStopButton.style.display = 'block';
+                        });
+                        
+                        this.currentAudio.addEventListener('ended', () => {
+                            console.log('⏹️ Audio playback finished');
+                            URL.revokeObjectURL(audioUrl);
+                            this.currentAudio = null;
+                            this.currentVoiceButton = null;
+                            if (voiceButton) {
+                                voiceButton.classList.remove('playing');
+                                voiceButton.innerHTML = '🔊 Play';
+                            }
+                            this.globalStopButton.style.display = 'none';
+                        });
+                        
+                        this.currentAudio.addEventListener('error', (e) => {
+                            console.error('❌ Audio playback error:', e);
+                            if (voiceButton) {
+                                voiceButton.classList.remove('playing');
+                                voiceButton.classList.add('error');
+                                voiceButton.innerHTML = '❌ Error';
+                                setTimeout(() => {
+                                    voiceButton.classList.remove('error');
+                                    voiceButton.innerHTML = '🔊 Retry';
+                                }, 3000);
+                            }
+                            this.globalStopButton.style.display = 'none';
+                        });
+                        
+                        // Attempt to play
+                        try {
+                            const playPromise = this.currentAudio.play();
+                            if (playPromise !== undefined) {
+                                await playPromise;
+                                console.log('✅ Enhanced audio started playing successfully');
+                            }
+                        } catch (playError) {
+                            console.error('❌ Play failed:', playError);
+                            
+                            if (voiceButton) {
+                                voiceButton.classList.remove('playing');
+                                voiceButton.innerHTML = '🔊 Click to retry';
+                            }
+                        }
+                        
+                        return true;
+                    } else {
+                        console.log('❌ Voice generation failed:', data.error);
+                        
+                        if (voiceButton) {
+                            voiceButton.classList.remove('playing');
+                            voiceButton.classList.add('error');
+                            voiceButton.innerHTML = '❌ Failed';
+                            setTimeout(() => {
+                                voiceButton.classList.remove('error');
+                                voiceButton.innerHTML = '🔊 Retry';
+                            }, 3000);
+                        }
+                        return false;
+                    }
+                    
+                } catch (error) {
+                    console.error('❌ Voice playback error:', error);
+                    
+                    if (voiceButton) {
+                        voiceButton.classList.remove('playing');
+                        voiceButton.classList.add('error');
+                        voiceButton.innerHTML = '❌ Error';
+                        setTimeout(() => {
+                            voiceButton.classList.remove('error');
+                            voiceButton.innerHTML = '🔊 Retry';
+                        }, 3000);
+                    }
+                    return false;
+                }
+            }
+            
+            base64ToBlob(base64, mimeType) {
+                try {
+                    const byteCharacters = atob(base64);
+                    const byteNumbers = new Array(byteCharacters.length);
+                    
+                    for (let i = 0; i < byteCharacters.length; i++) {
+                        byteNumbers[i] = byteCharacters.charCodeAt(i);
+                    }
+                    
+                    const byteArray = new Uint8Array(byteNumbers);
+                    const blob = new Blob([byteArray], { type: mimeType });
+                    
+                    console.log(`✅ Created enhanced audio blob: ${blob.size} bytes`);
+                    return blob;
+                } catch (error) {
+                    console.error('❌ Error creating blob:', error);
+                    return null;
+                }
+            }
+            
+            async sendMessage() {
+                const message = this.messageInput.value.trim();
+                if (!message) {
+                    console.log('⚠️ Empty message, not sending');
+                    return;
+                }
+                
+                console.log('💬 Sending message from Akashpatel2609:', message);
+                console.log('📅 Current Time: 2025-06-25 15:28:36');
+                
+                this.messageInput.disabled = true;
+                this.sendButton.disabled = true;
+                this.voiceButton.disabled = true;
+                
+                this.addMessage(message, 'user');
+                this.messageInput.value = '';
+                
+                this.showTypingIndicator();
+                
+                try {
+                    const response = await fetch('/chat', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            message: message,
+                            username: this.username
+                        })
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    
+                    const data = await response.json();
+                    
+                    console.log('🤖 Response received for Akashpatel2609:', {
+                        emotion: data.emotion_detected,
+                        crisis: data.crisis_level,
+                        mode: data.mode
+                    });
+                    
+                    this.hideTypingIndicator();
+                    this.addMessage(data.response, 'bot', data.emotion_detected);
+                    
+                    // Auto-play voice response if voice mode is enabled
+                    if (this.voiceMode) {
+                        setTimeout(() => {
+                            // Find the latest bot message voice button
+                            const latestVoiceButton = document.querySelector('.bot-message:last-child .voice-button');
+                            if (latestVoiceButton) {
+                                this.playVoiceResponse(data.response, latestVoiceButton);
+                            }
+                        }, 500);
+                    }
+                    
+                    if (data.crisis_level === 'high' || data.crisis_level === 'medium') {
+                        this.showCrisisResources();
+                    }
+                    
+                } catch (error) {
+                    console.error('❌ Chat Error:', error);
+                    this.hideTypingIndicator();
+                    this.addMessage(`I'm having trouble connecting right now, Akashpatel2609. Please try again, and remember that if you're in crisis, you can always call 911 or 988.`, 'bot');
+                }
+                
+                this.messageInput.disabled = false;
+                this.sendButton.disabled = false;
+                this.voiceButton.disabled = false;
+                this.messageInput.focus();
+            }
+            
+            addMessage(content, sender, emotion = null) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${sender}-message`;
+                
+                const avatarDiv = document.createElement('div');
+                avatarDiv.className = 'message-avatar';
+                
+                if (sender === 'user') {
+                    avatarDiv.textContent = '👤';
+                } else {
+                    const emotionEmojis = {
+                        'sadness': '💙',
+                        'anxiety': '🤗',
+                        'anger': '😌',
+                        'happiness': '😊',
+                        'fear': '🫂',
+                        'loneliness': '💜',
+                        'hopelessness': '🌟',
+                        'neutral': '🤖'
+                    };
+                    avatarDiv.textContent = emotionEmojis[emotion] || '🤖';
+                }
+                
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'message-content';
+                contentDiv.innerHTML = this.formatMessage(content);
+                
+                // Add voice button for bot messages
+                if (sender === 'bot') {
+                    const actionsDiv = document.createElement('div');
+                    actionsDiv.className = 'message-actions';
+                    
+                    const voiceBtn = document.createElement('button');
+                    voiceBtn.className = 'voice-button';
+                    voiceBtn.innerHTML = '🔊 Play';
+                    voiceBtn.title = 'Play/Stop voice response';
+                    voiceBtn.onclick = () => {
+                        this.playVoiceResponse(content, voiceBtn);
+                    };
+                    
+                    actionsDiv.appendChild(voiceBtn);
+                    contentDiv.appendChild(actionsDiv);
+                }
+                
+                const timeDiv = document.createElement('div');
+                timeDiv.className = 'message-time';
+                timeDiv.textContent = this.formatTime(new Date());
+                
+                messageDiv.appendChild(avatarDiv);
+                messageDiv.appendChild(contentDiv);
+                messageDiv.appendChild(timeDiv);
+                
+                this.chatMessages.appendChild(messageDiv);
+                this.scrollToBottom();
+                
+                console.log(`📝 Message added: ${sender} - ${content.substring(0, 50)}...`);
+            }
+            
+            formatMessage(message) {
+                return message.replace(/\n/g, '<br>');
+            }
+            
+            formatTime(date) {
+                return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            }
+            
+            showTypingIndicator() {
+                this.typingIndicator.style.display = 'flex';
+                this.scrollToBottom();
+                console.log('⏳ Typing indicator shown');
+            }
+            
+            hideTypingIndicator() {
+                this.typingIndicator.style.display = 'none';
+                console.log('✅ Typing indicator hidden');
+            }
+            
+            showActivities() {
+                this.addMessage("I'd like to explore the therapeutic activities!", 'user');
+                setTimeout(() => {
+                    const activitiesText = "That's wonderful, Akashpatel2609! Here are some activities that can help with mental wellness:\n\n🫁 Breathing exercises for anxiety relief\n🙏 Gratitude games for mood boosting\n🧩 Word puzzles for mental engagement\n📊 Mood tracking for self-awareness\n🧘 Progressive relaxation for stress relief\n🧠 Memory games for cognitive health\n\nWhich one sounds interesting to you? Just tell me and I'll guide you through it!";
+                    
+                    this.addMessage(activitiesText, 'bot');
+                    
+                    if (this.voiceMode) {
+                        setTimeout(() => {
+                            const latestVoiceButton = document.querySelector('.bot-message:last-child .voice-button');
+                            if (latestVoiceButton) {
+                                this.playVoiceResponse(activitiesText, latestVoiceButton);
+                            }
+                        }, 500);
+                    }
+                }, 1000);
+            }
+            
+            showCrisisResources() {
+                this.crisisResources.style.display = 'block';
+                setTimeout(() => {
+                    this.crisisResources.scrollIntoView({ behavior: 'smooth' });
+                }, 100);
+                console.log('🚨 Crisis resources shown');
+            }
+            
+            scrollToBottom() {
+                setTimeout(() => {
+                    this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
+                }, 100);
+            }
+        }
+
+        // Initialize the app when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🌟 Enhanced Voice Mental Health Buddy Loading...');
+            console.log('📅 Current Time: 2025-06-25 15:28:36 UTC');
+            console.log('👤 User: Akashpatel2609');
+            
+            setTimeout(() => {
+                new EnhancedVoiceMentalHealthBuddy();
+            }, 100);
+        });
+        
+        window.addEventListener('load', () => {
+            console.log('🔍 Page fully loaded with enhanced human-like voice capabilities for Akashpatel2609');
+        });
+    </script>
+</body>
+</html>
